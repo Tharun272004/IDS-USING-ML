@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Monitoring Console | Real-Time IDS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}?v=7">
+
+    <style>
+        body {
+            font-family: "Aptos", "Segoe UI", sans-serif;
+            background: #eef3f8;
+        }
+
+        main {
+            width: min(94%, 1500px);
+            padding-top: 34px;
+        }
+
+        .monitor-hero {
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-height: 500px;
+            overflow: hidden;
+            background-image:
+                linear-gradient(90deg, rgba(5, 14, 31, 0.9) 0%, rgba(5, 14, 31, 0.62) 52%, rgba(5, 14, 31, 0.2) 100%),
+                url("{{ url_for('static', filename='images/live-monitoring.jpg') }}");
+            background-position: center;
+            background-size: cover;
+            color: white;
+            border-radius: 18px;
+            padding: 48px 52px;
+            margin-bottom: 24px;
+            box-shadow: 0 16px 35px rgba(16, 24, 39, 0.16);
+        }
+
+        .monitor-hero h2 {
+            font-size: clamp(25px, 3vw, 36px);
+            letter-spacing: -0.8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .monitor-hero p {
+            color: #94a3b8;
+            font-size: 15px;
+            max-width: 650px;
+            line-height: 1.5;
+        }
+
+        .monitor-hero-copy {
+            position: relative;
+            z-index: 1;
+            max-width: 760px;
+        }
+
+        .monitor-hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: #79d9cf;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+        }
+
+        .monitor-hero-kicker::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #61d4c5;
+            box-shadow: 0 0 0 5px rgba(97, 212, 197, 0.14);
+        }
+
+        .monitor-status-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 22px 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(16, 24, 39, 0.06);
+            border-left: 6px solid #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .monitor-status-banner.banner-active {
+            border-left-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .monitor-status-banner.banner-stopped {
+            border-left-color: #dc2626;
+            background: #fff5f5;
+        }
+
+        .status-badge-lg {
+            font-size: 15px;
+            font-weight: 800;
+            padding: 8px 18px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge-lg.running {
+            background: #16a34a;
+            color: white;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .status-badge-lg.stopped {
+            background: #64748b;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+
+        .monitor-controls-card {
+            background: white;
+            border-radius: 14px;
+            padding: 26px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 24px rgba(16, 24, 39, 0.06);
+        }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 14px;
+        }
+
+        .controls-header h3 {
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-state-box {
+            min-width: 150px;
+            margin-left: auto;
+            padding: 12px 18px;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #dc2626;
+            border-radius: 10px;
+            background: #fff5f5;
+            text-align: center;
+        }
+
+        .control-state-box span {
+            display: block;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .control-state-box strong {
+            display: block;
+            margin-top: 3px;
+            color: #b91c1c;
+            font-size: 15px;
+        }
+
+        .control-state-box.scanning {
+            border-color: #bbf7d0;
+            border-left-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .control-state-box.scanning strong {
+            color: #15803d;
+        }
+
+        .control-state-box.stopped {
+            border-color: #fecaca;
+            border-left-color: #dc2626;
+            background: #fff5f5;
+        }
+
+        @media (max-width: 760px) {
+            .control-state-box {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+
+        .btn-action-lg {
+            border: none;
+            padding: 13px 26px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action-lg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-action-lg:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-start {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-stop {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-continue {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-history {
+            background: #475569;
+            color: white;
+        }
+
+        .metrics-grid-four {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .metric-tile {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .metric-tile span {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-tile strong {
+            display: block;
+            font-size: 28px;
+            margin-top: 8px;
+            color: #0f172a;
+        }
+
+        .metric-tile.danger strong {
+            color: #dc2626;
+        }
+
+        .metric-tile.success strong {
+            color: #16a34a;
+        }
+
+        .metric-tile.rate strong {
+            color: #d97706;
+        }
+
+        .stream-panel {
+            background: white;
+            border-radius: 14px;
+            padding: 25px 30px;
+            box-shadow: 0 8px 24px rgba(16, 24, 39, 0.06);
+        }
+
+        .stream-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .stream-header h3 {
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .stream-header span {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .status-kicker {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .scanner-message {
+            color: #0f172a;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .status-description,
+        .controls-note {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .status-description { margin: 0; }
+
+        .hidden-control { display: none; }
+
+        .empty-stream-cell {
+            color: #64748b;
+            padding: 25px;
+            text-align: center;
+        }
+
+        @media (max-width: 820px) {
+            main { padding-top: 22px; }
+
+            .monitor-hero {
+                min-height: 400px;
+                padding: 36px 26px;
+            }
+
+            .monitor-status-banner,
+            .controls-header,
+            .stream-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     TOP NAVIGATION BAR
+====================================================== -->
+<header class="topbar">
+
+    <div>
+        <h1>Real-Time Intrusion Detection System</h1>
+        <p>Machine Learning Network Security Monitor</p>
+    </div>
+
+    <div class="header-right">
+
+        <a href="/dashboard" class="top-nav-link">
+            📊 Dashboard
+        </a>
+
+        <a href="/overview" class="top-nav-link">
+            📘 Overview
+        </a>
+
+        <a href="/reports" class="top-nav-link">
+            📑 Reports
+        </a>
+
+        <a href="/live-monitoring" class="top-nav-link live-link active">
+            📡 Live Monitoring
+        </a>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            SYSTEM ACTIVE
+        </div>
+
+    </div>
+
+</header>
+
+<main>
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+    <div class="monitor-hero">
+        <div class="monitor-hero-copy">
+            <div class="monitor-hero-kicker">Live capture console</div>
+            <h2>📡 Live Network Monitoring & Capture Controller</h2>
+            <p>
+                Control the background Scapy packet sniffer, observe live bidirectional TCP/UDP flow reconstruction, and monitor incoming threat classifications in real time.
+            </p>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         SCANNER STATUS BANNER
+    ====================================================== -->
+    <div id="statusBanner" class="monitor-status-banner banner-stopped">
+        <div>
+            <div class="status-kicker">
+                Engine State
+            </div>
+            <h3 id="scannerMessage" class="scanner-message">
+                Checking scanner state...
+            </h3>
+            <p class="status-description">
+                Packets are sniffed promiscuously via Npcap/WinPcap and fed into Random Forest and specialized threat detectors.
+            </p>
+        </div>
+        <div>
+            <span id="scannerStatus" class="status-badge-lg stopped">
+                STOPPED
+            </span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         INTERACTIVE SCANNER CONTROLS
+    ====================================================== -->
+    <div class="monitor-controls-card">
+        <div class="controls-header">
+            <h3>⚡ Scanner Control Center</h3>
+            <span class="controls-note">Controls are saved immediately to background engine</span>
+        </div>
+
+        <div class="action-buttons-group">
+            <button id="startScanner" class="btn-action-lg btn-start">
+                ▶ START SCANNING
+            </button>
+
+            <button id="stopScanner" class="btn-action-lg btn-stop hidden-control">
+                ■ STOP SCANNING
+            </button>
+
+            <button id="continueScanner" class="btn-action-lg btn-continue hidden-control">
+                ↻ CONTINUE SCANNING
+            </button>
+
+            <button id="packetHistoryButton" class="btn-action-lg btn-history">
+                📋 PACKET HISTORY (ALL)
+            </button>
+
+            <div id="controlStateBox" class="control-state-box stopped" aria-live="polite">
+                <span>Scanner state</span>
+                <strong id="controlStateText">STOPPED</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         LIVE TELEMETRY METRICS
+    ====================================================== -->
+    <div class="metrics-grid-four">
+        <div class="metric-tile">
+            <span>Total Flows Processed</span>
+            <strong id="metricTotal">0</strong>
+        </div>
+
+        <div class="metric-tile success">
+            <span>Normal Traffic Flows</span>
+            <strong id="metricNormal">0</strong>
+        </div>
+
+        <div class="metric-tile danger">
+            <span>Threats & Attacks</span>
+            <strong id="metricAttack">0</strong>
+        </div>
+
+        <div class="metric-tile rate">
+            <span>Current Attack Rate</span>
+            <strong id="metricRate">0.0%</strong>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         LIVE INCOMING PACKET STREAM TABLE
+    ====================================================== -->
+    <div class="stream-panel">
+        <div class="stream-header">
+            <h3>⚡ Real-Time Inflow Stream (Latest Captured Flows)</h3>
+            <span id="lastStreamUpdate">Live: Connecting...</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>TIME</th>
+                        <th>SOURCE</th>
+                        <th>DESTINATION</th>
+                        <th>PROTOCOL</th>
+                        <th>THREAT VECTOR</th>
+                        <th>SEVERITY</th>
+                        <th>RESULT</th>
+                        <th>MODEL CONFIDENCE</th>
+                    </tr>
+                </thead>
+                <tbody id="liveStreamTable">
+                    <tr>
+                        <td colspan="8" class="empty-stream-cell">
+                            Loading real-time network stream...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- =====================================================
+     PACKET HISTORY MODAL
+====================================================== -->
+<div id="historyModal" class="history-modal">
+    <div class="history-modal-content">
+        <div class="history-modal-header">
+            <h2>Full Network Packet History (Latest 200 Flows)</h2>
+            <button id="historyClose" class="history-close">×</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>TIME</th>
+                        <th>SOURCE</th>
+                        <th>DESTINATION</th>
+                        <th>PROTOCOL</th>
+                        <th>THREAT VECTOR</th>
+                        <th>SEVERITY</th>
+                        <th>RESULT</th>
+                        <th>CONFIDENCE</th>
+                    </tr>
+                </thead>
+                <tbody id="packetHistoryTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/live_monitoring.js') }}?v=3"></script>
+
+</body>
+</html>

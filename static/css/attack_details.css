@@ -1,0 +1,506 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #eef1f5;
+
+    color: #172033;
+
+}
+
+
+.page {
+
+    width: 92%;
+
+    max-width: 1400px;
+
+    margin: auto;
+
+    padding: 30px 0 50px;
+
+}
+
+
+/* HEADER */
+
+.header {
+
+    background: #101827;
+
+    color: white;
+
+    padding: 28px 35px;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 30px;
+
+}
+
+
+.header h1 {
+
+    font-size: 30px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.header p {
+
+    color: #b9c5d6;
+
+}
+
+
+.button {
+
+    text-decoration: none;
+
+    color: white;
+
+    background: #4169e1;
+
+    padding: 11px 18px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+    display: inline-block;
+
+}
+
+
+.button:hover {
+
+    opacity: 0.9;
+
+}
+
+
+/* WARNING */
+
+.warning {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    background: #fff0f0;
+
+    border-left: 6px solid #e52d2d;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.warning-icon {
+
+    width: 55px;
+
+    height: 55px;
+
+    min-width: 55px;
+
+    border-radius: 50%;
+
+    background: #e52d2d;
+
+    color: white;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-size: 28px;
+
+}
+
+
+.warning h2 {
+
+    color: #b42323;
+
+    margin-bottom: 6px;
+
+}
+
+
+.warning p {
+
+    color: #667085;
+
+}
+
+
+/* SECTIONS */
+
+section {
+
+    margin-bottom: 30px;
+
+}
+
+
+.section-title {
+
+    margin-bottom: 18px;
+
+}
+
+
+/* SUMMARY */
+
+.summary-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+}
+
+
+.summary-card {
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,0.08);
+
+}
+
+
+.summary-card span {
+
+    display: block;
+
+    color: #687386;
+
+    font-size: 13px;
+
+    margin-bottom: 12px;
+
+    text-transform: uppercase;
+
+}
+
+
+.summary-card strong {
+
+    font-size: 24px;
+
+}
+
+
+.attack {
+
+    color: #e52d2d;
+
+}
+
+
+.risk {
+
+    color: #d97706;
+
+}
+
+
+/* PANEL */
+
+.panel {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,0.08);
+
+}
+
+
+.panel h2 {
+
+    margin-bottom: 25px;
+
+}
+
+
+/* DETAILS */
+
+.details-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 20px;
+
+}
+
+
+.detail {
+
+    background: #f5f7fa;
+
+    padding: 20px;
+
+    border-radius: 9px;
+
+}
+
+
+.detail span {
+
+    display: block;
+
+    color: #667085;
+
+    font-size: 13px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.detail strong {
+
+    font-size: 17px;
+
+    word-break: break-word;
+
+}
+
+
+/* EXPLANATION */
+
+.explanation {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+
+.explanation-item {
+
+    display: flex;
+
+    gap: 18px;
+
+    align-items: flex-start;
+
+}
+
+
+.number {
+
+    min-width: 38px;
+
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #4169e1;
+
+    color: white;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-weight: bold;
+
+}
+
+
+.explanation-item h3 {
+
+    margin-bottom: 6px;
+
+}
+
+
+.explanation-item p {
+
+    color: #667085;
+
+    line-height: 1.6;
+
+}
+
+
+/* RECOMMENDATION */
+
+.recommendation {
+
+    background: #101827;
+
+    color: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+}
+
+
+.recommendation h2 {
+
+    margin-bottom: 18px;
+
+}
+
+
+.recommendation ul {
+
+    padding-left: 22px;
+
+}
+
+
+.recommendation li {
+
+    margin-bottom: 12px;
+
+    color: #d7deea;
+
+    line-height: 1.5;
+
+}
+
+
+/* NO ATTACK */
+
+.no-attack {
+
+    text-align: center;
+
+    padding: 70px 30px;
+
+}
+
+
+.no-attack .warning-icon {
+
+    margin: 0 auto 20px;
+
+}
+
+
+.no-attack h2 {
+
+    margin-bottom: 10px;
+
+}
+
+
+.no-attack p {
+
+    color: #667085;
+
+    margin-bottom: 25px;
+
+}
+
+
+/* FOOTER */
+
+footer {
+
+    text-align: center;
+
+    color: #718096;
+
+    padding: 25px;
+
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+    .summary-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+
+    .details-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+
+    .header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 20px;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .summary-grid,
+    .details-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}

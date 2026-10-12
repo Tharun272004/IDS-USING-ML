@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Real-Time IDS Dashboard</title>
+
+    <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/dashboard.css') }}?v=17">
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div>
+        <h1>Real-Time Intrusion Detection System</h1>
+
+        <p>Machine Learning Network Security Monitor</p>
+    </div>
+
+    <div class="header-right">
+
+        <a href="/dashboard" class="top-nav-link active">
+            📊 Dashboard
+        </a>
+
+        <a href="/overview" class="top-nav-link">
+            📘 Overview
+        </a>
+
+        <a href="/reports" class="top-nav-link">
+            📑 Reports
+        </a>
+
+        <a href="/live-monitoring" class="top-nav-link live-link">
+            📡 Live Monitoring
+        </a>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            SYSTEM ACTIVE
+        </div>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <!-- =====================================================
+         LIVE ATTACK ALERT
+    ====================================================== -->
+
+    <div id="attackAlert" class="attack-alert hidden">
+
+        <div class="alert-icon">
+            ⚠
+        </div>
+
+        <div class="alert-content">
+
+            <h2>POTENTIAL INTRUSION DETECTED</h2>
+
+            <p id="alertMessage">
+                Suspicious network traffic detected.
+            </p>
+
+            <div class="alert-details">
+
+                <span>
+                    Threat:
+                    <strong id="alertThreatType">-</strong>
+                </span>
+
+                <span>
+                    Severity:
+                    <strong id="alertSeverity">-</strong>
+                </span>
+
+                <span>
+                    Source:
+                    <strong id="alertSource">-</strong>
+                </span>
+
+                <span>
+                    Destination:
+                    <strong id="alertDestination">-</strong>
+                </span>
+
+                <span>
+                    Protocol:
+                    <strong id="alertProtocol">-</strong>
+                </span>
+
+                <span>
+                    Confidence:
+                    <strong id="alertConfidence">-</strong>
+                </span>
+
+            </div>
+
+        </div>
+
+        <button id="closeAlert" class="close-alert">
+            ×
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <section class="stats">
+
+        <div class="card metric-total-card">
+
+            <div class="metric-icon metric-icon-total" aria-hidden="true">⌁</div>
+
+            <div class="card-title">
+                TOTAL REQUESTS
+            </div>
+
+            <div class="number" id="total">
+                0
+            </div>
+
+            <div class="metric-note">Active network flows</div>
+
+        </div>
+
+
+        <div class="card normal-card">
+
+            <div class="metric-icon metric-icon-normal" aria-hidden="true">✓</div>
+
+            <div class="card-title">
+                SECURE CONNECTIONS
+            </div>
+
+            <div class="number" id="normal">
+                0
+            </div>
+
+            <div class="metric-note">Normal traffic identified</div>
+
+        </div>
+
+
+        <div class="card attack-card">
+
+            <div class="metric-icon metric-icon-attack" aria-hidden="true">!</div>
+
+            <div class="card-title">
+                THREATS DETECTED
+            </div>
+
+            <div class="number" id="attack">
+                0
+            </div>
+
+            <div class="metric-note">Potential intrusions found</div>
+
+        </div>
+
+
+        <div class="card metric-rate-card">
+
+            <div class="metric-icon metric-icon-rate" aria-hidden="true">%</div>
+
+            <div class="card-title">
+                DETECTION RATE
+            </div>
+
+            <div class="number" id="attackRate">
+                0%
+            </div>
+
+            <div class="metric-note">Share of detected threats</div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SYSTEM STATUS
+    ====================================================== -->
+
+    <section class="dashboard-grid">
+
+        <div class="panel system-status-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    System Status
+                </h2>
+
+            </div>
+
+
+            <div class="system-info">
+
+                <div>
+
+                    <span>
+                        Packet Capture
+                    </span>
+
+                    <strong id="systemPacketStatus" class="online">
+                        STANDBY
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        ML Model
+                    </span>
+
+                    <strong class="online">
+                        ACTIVE
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Flow Analysis
+                    </span>
+
+                    <strong class="online">
+                        ACTIVE
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Monitoring
+                    </span>
+
+                    <strong class="online">
+                        LIVE
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ADVANCED IDS CHARTS
+    ====================================================== -->
+
+    <section class="charts-section">
+
+
+        <!-- =================================================
+             TRAFFIC CLASSIFICATION
+        ================================================== -->
+
+        <div class="panel chart-card traffic-classification-card">
+
+            <div class="panel-header">
+
+                <h2>
+                    Traffic Classification
+                </h2>
+
+                <span class="classification-live-label">
+                    Live
+                </span>
+
+            </div>
+
+
+            <div class="donut-container">
+
+                <div id="trafficDonut" class="donut-chart">
+
+                    <div class="donut-center">
+
+                        <strong id="donutTotal">
+                            0
+                        </strong>
+
+                        <span>
+                            FLOWS
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="donut-legend">
+
+
+                    <div class="chart-legend-item">
+
+                        <span class="legend-dot normal-dot">
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Normal
+                            </strong>
+
+                            <span id="donutNormal">
+                                0
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-legend-item">
+
+                        <span class="legend-dot attack-dot">
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Attack
+                            </strong>
+
+                            <span id="donutAttack">
+                                0
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="classification-details" aria-label="Traffic classification details">
+                <div class="classification-detail secure-detail">
+                    <span>Secure traffic</span>
+                    <strong id="secureTrafficRate">0%</strong>
+                    <small>Normal flow share</small>
+                </div>
+                <div class="classification-detail threat-detail">
+                    <span>Threat traffic</span>
+                    <strong id="threatTrafficRate">0%</strong>
+                    <small>Attack flow share</small>
+                </div>
+                <div class="classification-detail status-detail">
+                    <span>Monitoring status</span>
+                    <strong>LIVE</strong>
+                    <small>Classification engine active</small>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PROTOCOL DISTRIBUTION
+        ================================================== -->
+
+        <div class="panel chart-card protocol-distribution-card">
+
+            <div class="panel-header">
+
+                <h2>
+                    Protocol Distribution
+                </h2>
+
+                <span class="protocol-live-label">
+                    Live
+                </span>
+
+            </div>
+
+            <div id="protocolChart"
+                 class="horizontal-chart">
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             THREAT ACTIVITY SUMMARY
+        ================================================== -->
+
+        <div class="panel chart-card full-width threat-activity-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Threat Activity Summary
+                </h2>
+
+                <span>
+                    Attack predictions by minute
+                </span>
+
+            </div>
+
+            <p class="threat-summary-help">
+                Counts are grouped by minute from the prediction history. They represent attack predictions, not unique incidents or confirmed attacks.
+            </p>
+
+            <div class="threat-summary">
+                <div class="threat-metric">
+                    <span>Peak attacks / minute</span>
+                    <strong id="peakAttacks">0</strong>
+                </div>
+                <div class="threat-metric">
+                    <span>Minutes with attacks</span>
+                    <strong id="activeIntervals">0</strong>
+                </div>
+                <div class="threat-metric">
+                    <span>Latest minute attacks</span>
+                    <strong id="latestAttacks">0</strong>
+                </div>
+            </div>
+
+            <div id="threatSummaryList" class="threat-summary-list">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         LIVE NETWORK PREDICTIONS
+    ====================================================== -->
+
+    <section class="panel prediction-panel">
+
+        <div class="panel-header">
+
+            <h2>
+                Live Network Predictions
+            </h2>
+
+            <div class="panel-header-actions">
+                <button id="packetHistoryButton" class="scanner-button history-button">
+                    📋 Full Packet History
+                </button>
+                <span id="lastUpdate">
+                    Updating...
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper live-predictions-scroll">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>TIME</th>
+
+                        <th>SOURCE</th>
+
+                        <th>DESTINATION</th>
+
+                        <th>PROTOCOL</th>
+
+                        <th>THREAT VECTOR</th>
+
+                        <th>SEVERITY</th>
+
+                        <th>RESULT</th>
+
+                        <th>CONFIDENCE</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="predictionTable">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ATTACK ALERT HISTORY
+    ====================================================== -->
+
+    <section class="panel alert-history-panel">
+
+        <div class="panel-header">
+
+            <h2>
+                Attack Alert History
+            </h2>
+
+            <span>
+                Latest 20 alerts
+            </span>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>TIME</th>
+
+                        <th>SOURCE</th>
+
+                        <th>DESTINATION</th>
+
+                        <th>PROTOCOL</th>
+
+                        <th>THREAT VECTOR</th>
+
+                        <th>SEVERITY</th>
+
+                        <th>CONFIDENCE</th>
+
+                        <th>ACTION</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="alertTable">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================================
+     PACKET HISTORY MODAL
+====================================================== -->
+
+<div id="historyModal" class="history-modal">
+
+    <div class="history-modal-content">
+
+        <div class="history-modal-header">
+
+            <h2>Packet History</h2>
+
+            <button
+                id="historyClose"
+                class="history-close">
+                ×
+            </button>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>TIME</th>
+                        <th>SOURCE</th>
+                        <th>DESTINATION</th>
+                        <th>PROTOCOL</th>
+                        <th>THREAT VECTOR</th>
+                        <th>SEVERITY</th>
+                        <th>RESULT</th>
+                        <th>CONFIDENCE</th>
+                    </tr>
+                </thead>
+
+                <tbody id="packetHistoryTable">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</main>
+
+
+<footer>
+
+    Real-Time IDS • Machine Learning Network Security
+
+</footer>
+
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}?v=7">
+</script>
+
+</body>
+
+</html>

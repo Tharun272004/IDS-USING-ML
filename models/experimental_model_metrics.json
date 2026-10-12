@@ -1,0 +1,93 @@
+{
+    "model_type": "Experimental Live IDS Model",
+    "algorithm": "Random Forest Classifier",
+    "dataset": "NSL-KDD",
+    "training_samples": 125973,
+    "validation_samples": 25195,
+    "testing_samples": 22544,
+    "features": [
+        "duration",
+        "protocol_type",
+        "src_bytes",
+        "dst_bytes",
+        "count"
+    ],
+    "selected_configuration": {
+        "name": "baseline_balanced_leaf2",
+        "n_estimators": 300,
+        "class_weight": "balanced",
+        "min_samples_leaf": 2
+    },
+    "threshold": 0.5,
+    "accuracy": 0.7566,
+    "precision": 0.9595,
+    "recall": 0.5976,
+    "f1_score": 0.7365,
+    "confusion_matrix": [
+        [
+            9387,
+            324
+        ],
+        [
+            5164,
+            7669
+        ]
+    ],
+    "protocol_classes": [
+        "icmp",
+        "tcp",
+        "udp"
+    ],
+    "experiment_results": [
+        {
+            "name": "baseline_balanced_leaf2",
+            "n_estimators": 300,
+            "class_weight": "balanced",
+            "min_samples_leaf": 2,
+            "validation_threshold": 0.5,
+            "validation_precision": 0.9887,
+            "validation_recall": 0.9662,
+            "validation_f1": 0.9773
+        },
+        {
+            "name": "attack_weight_2_leaf2",
+            "n_estimators": 300,
+            "class_weight": "{0: 1, 1: 2}",
+            "min_samples_leaf": 2,
+            "validation_threshold": 0.6,
+            "validation_precision": 0.9884,
+            "validation_recall": 0.9661,
+            "validation_f1": 0.9771
+        },
+        {
+            "name": "attack_weight_3_leaf2",
+            "n_estimators": 300,
+            "class_weight": "{0: 1, 1: 3}",
+            "min_samples_leaf": 2,
+            "validation_threshold": 0.6,
+            "validation_precision": 0.9478,
+            "validation_recall": 0.9982,
+            "validation_f1": 0.9723
+        },
+        {
+            "name": "attack_weight_2_leaf1",
+            "n_estimators": 300,
+            "class_weight": "{0: 1, 1: 2}",
+            "min_samples_leaf": 1,
+            "validation_threshold": 0.6,
+            "validation_precision": 0.9881,
+            "validation_recall": 0.9666,
+            "validation_f1": 0.9772
+        },
+        {
+            "name": "attack_weight_2_leaf4",
+            "n_estimators": 300,
+            "class_weight": "{0: 1, 1: 2}",
+            "min_samples_leaf": 4,
+            "validation_threshold": 0.6,
+            "validation_precision": 0.9883,
+            "validation_recall": 0.9658,
+            "validation_f1": 0.9769
+        }
+    ]
+}

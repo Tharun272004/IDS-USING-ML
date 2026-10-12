@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Reports & Data Export | Real-Time IDS</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=7">
+
+    <style>
+        :root {
+            --report-ink: #172033;
+            --report-muted: #667085;
+            --report-line: #e4e9f0;
+            --report-surface: #ffffff;
+            --report-canvas: #f3f6fa;
+            --report-blue: #4169e1;
+            --report-cyan: #0ea5a8;
+            --report-red: #e05252;
+            --report-amber: #d9942f;
+        }
+
+        body {
+            font-family: "Aptos", "Segoe UI", sans-serif;
+            background: var(--report-canvas);
+            color: var(--report-ink);
+        }
+
+        .reports-container {
+            width: min(94%, 1440px);
+            margin: auto;
+            padding: 34px 0 70px;
+        }
+
+        .reports-hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            min-height: 500px;
+            background: linear-gradient(115deg, #07152d 0%, #163b55 58%, #164e63 100%);
+            color: white;
+            border-radius: 18px;
+            padding: 48px 52px;
+            margin-bottom: 22px;
+            box-shadow: 0 16px 35px rgba(16, 24, 39, 0.16);
+        }
+
+        .reports-hero-copy {
+            position: relative;
+            z-index: 1;
+            flex: 1 1 55%;
+        }
+
+        .reports-hero-image {
+            position: relative;
+            z-index: 1;
+            flex: 0 1 42%;
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            filter: drop-shadow(0 16px 20px rgba(3, 12, 25, 0.35));
+        }
+
+        .reports-hero h2 {
+            position: relative;
+            z-index: 1;
+            font-size: clamp(24px, 3vw, 34px);
+            letter-spacing: -0.8px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .reports-hero p {
+            position: relative;
+            z-index: 1;
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.5;
+            max-width: 760px;
+            text-align: left;
+        }
+
+        .filter-card {
+            background: var(--report-surface);
+            border-radius: 14px;
+            padding: 0 28px 26px;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 24px rgba(16, 24, 39, 0.06);
+            border: 1px solid var(--report-line);
+            overflow: hidden;
+        }
+
+        .filter-card h3 {
+            margin: 0 -28px 24px;
+            padding: 17px 28px;
+            background: linear-gradient(100deg, #f97316, #ea580c);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(234, 88, 12, 0.2);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .preset-btn {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #334155;
+            padding: 9px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .preset-btn.active {
+            background: #ea580c;
+            color: white;
+            border-color: #ea580c;
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+        }
+
+        .date-inputs-row {
+            display: grid;
+            grid-template-columns: minmax(150px, 0.8fr) minmax(0, 1fr) minmax(0, 1fr) auto auto;
+            gap: 16px;
+            align-items: flex-end;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .input-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border-radius: 7px;
+            border: 1px solid #fed7aa;
+            font-size: 14px;
+            font-family: inherit;
+            color: #0f172a;
+            background: #fffaf5;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .input-group select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border-radius: 7px;
+            border: 1px solid #fed7aa;
+            font-size: 14px;
+            font-family: inherit;
+            color: #0f172a;
+            background: #fffaf5;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .input-group select:focus {
+            border-color: #f97316;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+        }
+
+        .input-group input:focus {
+            border-color: #f97316;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+        }
+
+        .btn-apply-filter {
+            background: #ea580c;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 7px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-apply-filter:hover {
+            background: #c2410c;
+        }
+
+        .btn-clear-filter {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+            padding: 11px 14px;
+            border-radius: 7px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-clear-filter:hover {
+            background: #ffedd5;
+            border-color: #fb923c;
+        }
+
+        .export-actions-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn-download-pdf {
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download-pdf:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+        }
+
+        .btn-download-csv {
+            background: #059669;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download-csv:hover {
+            background: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.35);
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .preview-card {
+            position: relative;
+            overflow: hidden;
+            background: var(--report-surface);
+            border-radius: 12px;
+            padding: 20px 22px;
+            border: 1px solid var(--report-line);
+            box-shadow: 0 8px 20px rgba(16, 24, 39, 0.045);
+        }
+
+        .preview-card::after {
+            content: "";
+            position: absolute;
+            width: 56px;
+            height: 56px;
+            right: -22px;
+            bottom: -24px;
+            border: 8px solid rgba(65, 105, 225, 0.08);
+            border-radius: 50%;
+        }
+
+        .preview-card span {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .preview-card strong {
+            display: block;
+            font-size: 26px;
+            margin-top: 6px;
+            color: var(--report-ink);
+        }
+
+        .preview-card-normal {
+            border-top: 3px solid #16a34a;
+        }
+
+        .preview-card-normal strong { color: #16834a; }
+
+        .preview-card-attack {
+            border-top: 3px solid var(--report-red);
+        }
+
+        .preview-card-attack strong { color: var(--report-red); }
+
+        .preview-card-ratio {
+            border-top: 3px solid var(--report-amber);
+        }
+
+        .preview-card-ratio strong { color: #bd7620; }
+
+        .report-visuals {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.15fr);
+            align-items: start;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .protocol-visual {
+            grid-column: 1 / -1;
+        }
+
+        .visual-card {
+            align-self: start;
+            background: var(--report-surface);
+            border: 1px solid var(--report-line);
+            border-top: 4px solid #8bd3a7;
+            border-radius: 14px;
+            padding: 24px 26px;
+            box-shadow: 0 8px 24px rgba(16, 24, 39, 0.06);
+        }
+
+        .visual-card:first-child {
+            background: #f4fbf7;
+        }
+
+        .visual-card:nth-child(2) {
+            background: #fff8f4;
+            border-top-color: #f1a38b;
+        }
+
+        .visual-card.protocol-visual {
+            background: #f3fbfd;
+            border-top-color: #8bd4df;
+        }
+
+        .visual-card h3,
+        .breakdown-box h3 {
+            color: var(--report-ink);
+            font-size: 17px;
+            letter-spacing: -0.2px;
+            margin-bottom: 5px;
+        }
+
+        .visual-card > p {
+            color: var(--report-muted);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .threat-insights {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin: 20px 0 4px;
+            padding-top: 16px;
+            border-top: 1px solid var(--report-line);
+        }
+
+        .threat-insight {
+            min-width: 0;
+            padding: 10px 11px;
+            border-radius: 9px;
+            background: #f7f9fb;
+        }
+
+        .threat-insight span {
+            display: block;
+            overflow: hidden;
+            color: var(--report-muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.45px;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .threat-insight strong {
+            display: block;
+            overflow: hidden;
+            margin-top: 4px;
+            color: var(--report-ink);
+            font-size: 15px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .threat-notes {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .threat-note {
+            padding: 10px 11px;
+            border-left: 3px solid #e05252;
+            border-radius: 0 8px 8px 0;
+            background: #fff8f6;
+            color: #667085;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .threat-note strong {
+            display: block;
+            margin-bottom: 3px;
+            color: #344054;
+            font-size: 11px;
+        }
+
+        .donut-layout {
+            display: grid;
+            grid-template-columns: 170px 1fr;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .report-donut {
+            width: 170px;
+            aspect-ratio: 1;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: conic-gradient(#e05252 0deg, #e05252 0deg, #dce6ef 0deg, #dce6ef 360deg);
+            box-shadow: inset 0 0 0 1px rgba(16, 24, 39, 0.06);
+        }
+
+        .report-donut::before {
+            content: "";
+            width: 112px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: var(--report-surface);
+            grid-area: 1 / 1;
+        }
+
+        .donut-center {
+            grid-area: 1 / 1;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .donut-center strong {
+            display: block;
+            color: var(--report-ink);
+            font-size: 24px;
+        }
+
+        .donut-center span {
+            color: var(--report-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .chart-legend,
+        .bar-list {
+            display: grid;
+            gap: 13px;
+            align-content: start;
+        }
+
+        .legend-row,
+        .bar-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: var(--report-muted);
+            font-size: 13px;
+        }
+
+        .legend-row strong,
+        .bar-label strong { color: var(--report-ink); }
+
+        .legend-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.normal { background: #16a34a; }
+        .legend-dot.attack { background: var(--report-red); }
+
+        .bar-track {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 99px;
+            background: #edf1f5;
+            margin-top: 7px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            min-width: 2px;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--report-blue), var(--report-cyan));
+            transition: width 0.45s ease;
+        }
+
+        .bar-fill.threat-fill {
+            background: linear-gradient(90deg, #e05252, #d9942f);
+        }
+
+        .chart-empty {
+            color: var(--report-muted);
+            font-size: 13px;
+            padding: 20px 0;
+        }
+
+        .breakdown-box {
+            background: var(--report-surface);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 8px 24px rgba(16, 24, 39, 0.06);
+            border: 1px solid var(--report-line);
+        }
+
+        .breakdown-sections {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: 22px;
+        }
+
+        .breakdown-section {
+            min-width: 0;
+            padding: 16px;
+            border-radius: 10px;
+            background: #fffaf5;
+            border-top: 3px solid #f4bd8f;
+        }
+
+        .breakdown-section + .breakdown-section {
+            padding-left: 22px;
+            border-left: 1px solid var(--report-line);
+            border-top-color: #9bd8df;
+            background: #f4fbfd;
+        }
+
+        .breakdown-section h3 {
+            color: var(--report-ink);
+            font-size: 16px;
+            letter-spacing: -0.2px;
+            margin-bottom: 5px;
+        }
+
+        .breakdown-section > p {
+            color: var(--report-muted);
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+
+        .pill-list {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 26px;
+        }
+
+        .breakdown-section .pill-list {
+            grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+            margin-bottom: 0;
+        }
+
+        .stat-chip {
+            position: relative;
+            align-items: stretch;
+            justify-content: center;
+            gap: 5px;
+            min-height: 68px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #dbe3ec;
+            border-left: 3px solid #4169e1;
+        }
+
+        .stat-chip span {
+            color: #667085;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.35px;
+            text-transform: uppercase;
+        }
+
+        .stat-chip strong {
+            color: var(--report-ink);
+            font-size: 18px;
+        }
+
+        .stat-chip small {
+            color: var(--report-muted);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .breakdown-box .stat-chip::after {
+            content: "";
+            display: block;
+            height: 3px;
+            width: 100%;
+            margin-top: 3px;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #4169e1, #0ea5a8);
+            opacity: 0.8;
+        }
+
+        .breakdown-box .stat-chip[style*="dc2626"] {
+            border-left-color: #e05252 !important;
+        }
+
+        .breakdown-box .stat-chip[style*="dc2626"]::after {
+            background: linear-gradient(90deg, #e05252, #d9942f);
+        }
+
+        @media (max-width: 760px) {
+            .reports-container { width: 92%; padding-top: 22px; }
+            .reports-hero {
+                min-height: 400px;
+                padding: 36px 26px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .reports-hero-image {
+                flex-basis: auto;
+                max-height: 180px;
+            }
+            .filter-card, .visual-card, .breakdown-box { padding: 20px; }
+            .report-visuals { grid-template-columns: 1fr; }
+            .protocol-visual { grid-column: auto; }
+            .threat-insights, .threat-notes { grid-template-columns: 1fr; }
+            .breakdown-sections { grid-template-columns: 1fr; }
+            .breakdown-section + .breakdown-section {
+                padding-left: 0;
+                padding-top: 20px;
+                border-top: 1px solid var(--report-line);
+                border-left: 0;
+            }
+            .donut-layout { grid-template-columns: 145px 1fr; gap: 16px; }
+            .report-donut { width: 145px; }
+            .date-inputs-row { grid-template-columns: 1fr; align-items: stretch; }
+            .input-group, .input-group input, .input-group select, .btn-apply-filter, .btn-clear-filter { width: 100%; }
+        }
+
+        .preview-card.normal-traffic {
+            border-left: 4px solid #16a34a;
+        }
+
+        .preview-card.normal-traffic strong {
+            color: #16a34a;
+        }
+
+        .preview-card.intrusions {
+            border-left: 4px solid #dc2626;
+        }
+
+        .preview-card.intrusions strong {
+            color: #dc2626;
+        }
+
+        .preview-card.attack-ratio {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .preview-card.attack-ratio strong {
+            color: #d97706;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================================
+     TOP NAVIGATION BAR
+====================================================== -->
+    <header class="topbar">
+
+        <div>
+            <h1>Real-Time Intrusion Detection System</h1>
+            <p>Machine Learning Network Security Monitor</p>
+        </div>
+
+        <div class="header-right">
+
+            <a href="/dashboard" class="top-nav-link">
+                📊 Dashboard
+            </a>
+
+            <a href="/overview" class="top-nav-link">
+                📘 Overview
+            </a>
+
+            <a href="/reports" class="top-nav-link active">
+                📑 Reports
+            </a>
+
+            <a href="/live-monitoring" class="top-nav-link live-link">
+                📡 Live Monitoring
+            </a>
+
+            <div class="status">
+                <span class="status-dot"></span>
+                SYSTEM ACTIVE
+            </div>
+
+        </div>
+
+    </header>
+
+    <main class="reports-container">
+
+        <!-- =====================================================
+         HERO
+    ====================================================== -->
+        <div class="reports-hero">
+            <div class="reports-hero-copy">
+                <h2>📑 Forensic Security Reports & Scanned Data Export</h2>
+                <p>
+                    Filter captured network traffic by time period, inspect aggregated attack distributions, and download
+                    comprehensive forensic PDF reports or raw structured CSV scan logs for offline auditing.
+                </p>
+            </div>
+            <img class="reports-hero-image"
+                 src="{{ url_for('static', filename='images/reports-hero.svg') }}"
+                 alt="Forensic security report visualization">
+        </div>
+
+        <!-- =====================================================
+         DATE RANGE SELECTION CARD
+    ====================================================== -->
+        <div class="filter-card">
+            <h3>⌕ Filter and Search</h3>
+
+            <div class="preset-buttons">
+                <button class="preset-btn" data-hours="1">Last 1 Hour</button>
+                <button class="preset-btn" data-hours="6">Last 6 Hours</button>
+                <button class="preset-btn" data-hours="24">Last 24 Hours</button>
+                <button class="preset-btn" data-hours="168">Last 7 Days</button>
+                <button class="preset-btn active" data-hours="all">All Recorded Traffic</button>
+            </div>
+
+            <div class="date-inputs-row">
+                <div class="input-group">
+                    <label for="attackType">Attack Type</label>
+                    <select id="attackType">
+                        <option value="all">All Types</option>
+                        <option value="normal">Normal Traffic</option>
+                        <option value="attack">Attacks</option>
+                        <option value="anomalous_flow">Anomalous Flow</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate">
+                </div>
+
+                <div class="input-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate">
+                </div>
+
+                <button id="applyFilterBtn" class="btn-apply-filter">
+                    🔍 Apply Range
+                </button>
+
+                <button id="clearFilterBtn" class="btn-clear-filter" type="button">
+                    ⊗ Clear Filters
+                </button>
+            </div>
+
+            <div class="export-actions-row">
+                <a id="downloadPdfLink" href="/generate-report" class="btn-download-pdf" target="_blank">
+                    📄 Download PDF Security Report
+                </a>
+
+                <a id="downloadCsvLink" href="/api/export-csv" class="btn-download-csv">
+                    📥 Download Filtered CSV Data
+                </a>
+            </div>
+        </div>
+
+        <!-- =====================================================
+         FILTERED METRICS PREVIEW
+    ====================================================== -->
+        <div class="preview-grid">
+            <div class="preview-card">
+                <span>Flows in Selected Window</span>
+                <strong id="windowTotal">0</strong>
+            </div>
+
+            <div class="preview-card preview-card-normal">
+                <span>Normal Traffic</span>
+                <strong id="windowNormal">0</strong>
+            </div>
+
+            <div class="preview-card preview-card-attack">
+                <span>Intrusions &amp; Attacks</span>
+                <strong id="windowAttack">0</strong>
+            </div>
+
+            <div class="preview-card preview-card-ratio">
+                <span>Attack Ratio</span>
+                <strong id="windowRate">0.0%</strong>
+            </div>
+        </div>
+
+        <section class="report-visuals" aria-label="Report visual summaries">
+            <article class="visual-card">
+                <h3>Traffic posture</h3>
+                <p>Normal traffic compared with detected intrusions.</p>
+
+                <div class="donut-layout">
+                    <div id="reportDonut" class="report-donut" role="img" aria-label="Traffic posture chart">
+                        <div class="donut-center">
+                            <strong id="donutRate">0%</strong>
+                            <span>attack rate</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-legend">
+                        <div class="legend-row">
+                            <span class="legend-name"><span class="legend-dot normal"></span>Normal traffic</span>
+                            <strong id="legendNormal">0</strong>
+                        </div>
+                        <div class="legend-row">
+                            <span class="legend-name"><span class="legend-dot attack"></span>Intrusions</span>
+                            <strong id="legendAttack">0</strong>
+                        </div>
+                        <div class="legend-row">
+                            <span class="legend-name">Total flows</span>
+                            <strong id="legendTotal">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="visual-card">
+                <h3>🛡️ Detected Threat Vectors in Selected Window</h3>
+                <p>Attack activity grouped by detected threat type.</p>
+                <div id="threatChart" class="bar-list">
+                    <span class="chart-empty">Loading threat vector distribution...</span>
+                </div>
+                <div class="threat-insights" aria-label="Threat vector summary">
+                    <div class="threat-insight">
+                        <span>Top vector</span>
+                        <strong id="topThreatName">-</strong>
+                    </div>
+                    <div class="threat-insight">
+                        <span>Threat types</span>
+                        <strong id="threatTypeCount">0</strong>
+                    </div>
+                    <div class="threat-insight">
+                        <span>Top vector share</span>
+                        <strong id="topThreatShare">0%</strong>
+                    </div>
+                </div>
+                <div id="threatNotes" class="threat-notes"></div>
+            </article>
+
+            <article class="visual-card protocol-visual">
+                <h3>🌐 Protocol Distribution in Selected Window</h3>
+                <p>Flow volume grouped by network protocol.</p>
+                <div id="protocolChart" class="bar-list">
+                    <span class="chart-empty">Loading protocol distribution...</span>
+                </div>
+            </article>
+        </section>
+
+        <!-- =====================================================
+         THREAT VECTORS & PROTOCOLS BREAKDOWN
+    ====================================================== -->
+        <div class="breakdown-box">
+            <div class="breakdown-sections">
+                <section class="breakdown-section">
+                    <h3>🛡️ Threat vector details</h3>
+                    <p>Counts and share of detected attacks in this window.</p>
+                    <div id="threatVectorsList" class="pill-list">
+                        <span class="stat-chip">Loading threat vector counts...</span>
+                    </div>
+                </section>
+
+                <section class="breakdown-section">
+                    <h3>🌐 Protocol details</h3>
+                    <p>Traffic volume grouped by the observed protocol.</p>
+                    <div id="protocolList" class="pill-list">
+                        <span class="stat-chip">Loading protocol counts...</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let currentStartTime = "";
+        let currentEndTime = "";
+        let currentAttackType = "all";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setupPresetButtons();
+            setupCustomInputs();
+            fetchReportStats();
+        });
+
+        function setupPresetButtons() {
+            const buttons = document.querySelectorAll(".preset-btn");
+            buttons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    buttons.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+
+                    const hours = btn.getAttribute("data-hours");
+                    if (hours === "all") {
+                        currentStartTime = "";
+                        currentEndTime = "";
+                        document.getElementById("startDate").value = "";
+                        document.getElementById("endDate").value = "";
+                    } else {
+                        const h = parseInt(hours, 10);
+                        const now = new Date();
+                        const past = new Date(now.getTime() - (h * 60 * 60 * 1000));
+
+                        currentEndTime = formatDate(now);
+                        currentStartTime = formatDate(past);
+
+                        document.getElementById("startDate").value = formatDateInput(past);
+                        document.getElementById("endDate").value = formatDateInput(now);
+                    }
+
+                    updateDownloadLinks();
+                    fetchReportStats();
+                });
+            });
+        }
+
+        function setupCustomInputs() {
+            document.getElementById("attackType").addEventListener("change", () => {
+                currentAttackType = document.getElementById("attackType").value;
+                updateDownloadLinks();
+                fetchReportStats();
+            });
+
+            document.getElementById("applyFilterBtn").addEventListener("click", () => {
+                document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+                currentStartTime = formatDateForRequest(document.getElementById("startDate").value, false);
+                currentEndTime = formatDateForRequest(document.getElementById("endDate").value, true);
+                updateDownloadLinks();
+                fetchReportStats();
+            });
+
+            document.getElementById("clearFilterBtn").addEventListener("click", () => {
+                currentStartTime = "";
+                currentEndTime = "";
+                currentAttackType = "all";
+                document.getElementById("startDate").value = "";
+                document.getElementById("endDate").value = "";
+                document.getElementById("attackType").value = "all";
+                document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+                document.querySelector('.preset-btn[data-hours="all"]').classList.add("active");
+                updateDownloadLinks();
+                fetchReportStats();
+            });
+        }
+
+        function formatDate(d) {
+            const pad = n => String(n).padStart(2, "0");
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+
+        function formatDateInput(d) {
+            const pad = n => String(n).padStart(2, "0");
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        }
+
+        function formatDateForRequest(value, endOfDay) {
+            if (!value) return "";
+            return `${value} ${endOfDay ? "23:59:59" : "00:00:00"}`;
+        }
+
+        function updateDownloadLinks() {
+            const pdfLink = document.getElementById("downloadPdfLink");
+            const csvLink = document.getElementById("downloadCsvLink");
+
+            let query = "";
+            const params = [];
+            if (currentStartTime) params.push(`start_time=${encodeURIComponent(currentStartTime)}`);
+            if (currentEndTime) params.push(`end_time=${encodeURIComponent(currentEndTime)}`);
+            if (currentAttackType !== "all") params.push(`attack_type=${encodeURIComponent(currentAttackType)}`);
+            if (params.length > 0) query = "?" + params.join("&");
+
+            pdfLink.href = `/generate-report${query}`;
+            csvLink.href = `/api/export-csv${query}`;
+        }
+
+        async function fetchReportStats() {
+            let url = "/api/report-stats";
+            const params = [];
+            if (currentStartTime) params.push(`start_time=${encodeURIComponent(currentStartTime)}`);
+            if (currentEndTime) params.push(`end_time=${encodeURIComponent(currentEndTime)}`);
+            if (currentAttackType !== "all") params.push(`attack_type=${encodeURIComponent(currentAttackType)}`);
+            if (params.length > 0) url += "?" + params.join("&");
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                document.getElementById("windowTotal").innerText = (data.total || 0).toLocaleString();
+                document.getElementById("windowNormal").innerText = (data.normal || 0).toLocaleString();
+                document.getElementById("windowAttack").innerText = (data.attack || 0).toLocaleString();
+                document.getElementById("windowRate").innerText = (data.attack_rate || 0) + "%";
+
+                updateReportDonut(data.normal || 0, data.attack || 0, data.total || 0, data.attack_rate || 0);
+                updateThreatChart(data.threat_types || {});
+                updateProtocolChart(data.protocols || {});
+
+                // Render threat breakdown
+                const threatDiv = document.getElementById("threatVectorsList");
+                threatDiv.innerHTML = "";
+                const threats = data.threat_types || {};
+                const threatTotal = Object.values(threats).reduce((sum, count) => sum + count, 0);
+                if (Object.keys(threats).length === 0) {
+                    threatDiv.innerHTML = `<span class="stat-chip" style="color: #16a34a;">No attacks detected in this period.</span>`;
+                } else {
+                    for (const [threat, count] of sortCountEntries(threats)) {
+                        const share = threatTotal > 0 ? ((count / threatTotal) * 100).toFixed(1) : "0.0";
+                        threatDiv.innerHTML += `
+                        <div class="stat-chip" style="border-left: 3px solid #dc2626;">
+                            <span>${escapeReportText(threat.replace(/_/g, " "))}:</span>
+                            <strong>${count.toLocaleString()}</strong>
+                            <small>${share}% of detected attacks</small>
+                        </div>
+                    `;
+                    }
+                }
+
+                // Render protocol breakdown
+                const protoDiv = document.getElementById("protocolList");
+                protoDiv.innerHTML = "";
+                const protos = data.protocols || {};
+                const protocolTotal = Object.values(protos).reduce((sum, count) => sum + count, 0);
+                if (Object.keys(protos).length === 0) {
+                    protoDiv.innerHTML = `<span class="stat-chip">No protocols recorded.</span>`;
+                } else {
+                    for (const [proto, count] of sortCountEntries(protos)) {
+                        const share = protocolTotal > 0 ? ((count / protocolTotal) * 100).toFixed(1) : "0.0";
+                        protoDiv.innerHTML += `
+                        <div class="stat-chip">
+                            <span>${escapeReportText(proto.toUpperCase())}:</span>
+                            <strong>${count.toLocaleString()}</strong>
+                            <small>${share}% of observed flows</small>
+                        </div>
+                    `;
+                    }
+                }
+            } catch (e) {
+                console.error("Report stats fetch error:", e);
+            }
+        }
+
+        function updateReportDonut(normal, attack, total, attackRate) {
+            const donut = document.getElementById("reportDonut");
+            const angle = total > 0 ? (attack / total) * 360 : 0;
+            donut.style.background = `conic-gradient(#e05252 0deg ${angle}deg, #16a34a ${angle}deg 360deg)`;
+
+            document.getElementById("donutRate").innerText = `${attackRate}%`;
+            document.getElementById("legendNormal").innerText = normal.toLocaleString();
+            document.getElementById("legendAttack").innerText = attack.toLocaleString();
+            document.getElementById("legendTotal").innerText = total.toLocaleString();
+        }
+
+        function sortCountEntries(counts) {
+            return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        }
+
+        function updateThreatChart(threats) {
+            const chart = document.getElementById("threatChart");
+            const entries = sortCountEntries(threats);
+            const maximum = entries.length ? Math.max(...entries.map(([, count]) => count)) : 0;
+            const totalThreats = entries.reduce((sum, [, count]) => sum + count, 0);
+            const topThreat = entries[0] || null;
+
+            document.getElementById("topThreatName").innerText = topThreat
+                ? topThreat[0].replace(/_/g, " ")
+                : "None";
+            document.getElementById("threatTypeCount").innerText = entries.length.toLocaleString();
+            document.getElementById("topThreatShare").innerText = topThreat && totalThreats > 0
+                ? `${((topThreat[1] / totalThreats) * 100).toFixed(1)}%`
+                : "0%";
+
+            updateThreatNotes(entries);
+
+            if (!entries.length) {
+                chart.innerHTML = '<span class="chart-empty">No threat vectors detected in this period.</span>';
+                return;
+            }
+
+            chart.innerHTML = entries.map(([threat, count]) => {
+                const width = maximum > 0 ? (count / maximum) * 100 : 0;
+                return `
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>${escapeReportText(threat.replace(/_/g, " "))}</span>
+                            <strong>${count.toLocaleString()}</strong>
+                        </div>
+                        <div class="bar-track" aria-hidden="true">
+                            <div class="bar-fill threat-fill" style="width: ${width}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function updateThreatNotes(entries) {
+            const notes = document.getElementById("threatNotes");
+            const descriptions = {
+                ANOMALOUS_FLOW: "Unusual flow behavior identified by the ML model.",
+                C2_BEACON: "Periodic communication pattern that may indicate command and control.",
+                DATA_EXFILTRATION: "Outbound transfer behavior that may indicate data theft.",
+                DNS_TUNNELING: "High-entropy DNS activity that may conceal a data channel."
+            };
+
+            notes.innerHTML = entries.slice(0, 3).map(([threat]) => `
+                <div class="threat-note">
+                    <strong>${escapeReportText(threat.replace(/_/g, " "))}</strong>
+                    ${escapeReportText(descriptions[threat] || "Suspicious network behavior requiring review.")}
+                </div>
+            `).join("");
+        }
+
+        function updateProtocolChart(protocols) {
+            const chart = document.getElementById("protocolChart");
+            const entries = sortCountEntries(protocols);
+            const maximum = entries.length ? Math.max(...entries.map(([, count]) => count)) : 0;
+
+            if (!entries.length) {
+                chart.innerHTML = '<span class="chart-empty">No protocol data in this period.</span>';
+                return;
+            }
+
+            chart.innerHTML = entries.map(([protocol, count]) => {
+                const width = maximum > 0 ? (count / maximum) * 100 : 0;
+                return `
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>${escapeReportText(protocol.toUpperCase())}</span>
+                            <strong>${count.toLocaleString()}</strong>
+                        </div>
+                        <div class="bar-track" aria-hidden="true">
+                            <div class="bar-fill" style="width: ${width}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function escapeReportText(value) {
+            return String(value).replace(/[&<>'"]/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "'": "&#39;",
+                '"': "&quot;"
+            }[character]));
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,787 @@
+{
+  "evaluation_scope": {
+    "dataset": "NSL-KDD",
+    "features": [
+      "duration",
+      "protocol_type",
+      "src_bytes",
+      "dst_bytes",
+      "count"
+    ],
+    "split": "official KDDTrain+ for fitting, official KDDTest+ for final evaluation",
+    "threshold_policy": "0.5 is the reported operating point; threshold sweep is descriptive and does not select a test threshold",
+    "feature_mapping": {
+      "duration": "NSL-KDD connection duration; live flow elapsed seconds",
+      "protocol_type": "NSL-KDD protocol label; live broad protocol mapping",
+      "src_bytes": "NSL-KDD source bytes; live captured source-direction bytes",
+      "dst_bytes": "NSL-KDD destination bytes; live captured destination-direction bytes",
+      "count": "NSL-KDD connection-context count; live destination-host connections observed in the prior two seconds"
+    },
+    "external_dataset": "not supplied"
+  },
+  "model_comparison": {
+    "majority_baseline": {
+      "accuracy": 0.4308,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          9711,
+          0
+        ],
+        [
+          12833,
+          0
+        ]
+      ],
+      "fit_seconds": 0.005,
+      "inference_ms_per_sample": 0.0,
+      "threshold": 0.5
+    },
+    "logistic_regression": {
+      "accuracy": 0.6819,
+      "precision": 0.903,
+      "recall": 0.4942,
+      "f1_score": 0.6388,
+      "false_positive_rate": 0.0701,
+      "confusion_matrix": [
+        [
+          9030,
+          681
+        ],
+        [
+          6491,
+          6342
+        ]
+      ],
+      "fit_seconds": 1.981,
+      "inference_ms_per_sample": 0.0001,
+      "threshold": 0.5
+    },
+    "decision_tree": {
+      "accuracy": 0.7614,
+      "precision": 0.9264,
+      "recall": 0.631,
+      "f1_score": 0.7507,
+      "false_positive_rate": 0.0662,
+      "confusion_matrix": [
+        [
+          9068,
+          643
+        ],
+        [
+          4736,
+          8097
+        ]
+      ],
+      "fit_seconds": 0.217,
+      "inference_ms_per_sample": 0.0001,
+      "threshold": 0.5
+    },
+    "random_forest": {
+      "accuracy": 0.7566,
+      "precision": 0.9595,
+      "recall": 0.5976,
+      "f1_score": 0.7365,
+      "false_positive_rate": 0.0334,
+      "confusion_matrix": [
+        [
+          9387,
+          324
+        ],
+        [
+          5164,
+          7669
+        ]
+      ],
+      "fit_seconds": 4.155,
+      "inference_ms_per_sample": 0.0072,
+      "threshold": 0.5
+    },
+    "mlp_neural_network": {
+      "accuracy": 0.737,
+      "precision": 0.9782,
+      "recall": 0.5502,
+      "f1_score": 0.7043,
+      "false_positive_rate": 0.0162,
+      "confusion_matrix": [
+        [
+          9554,
+          157
+        ],
+        [
+          5772,
+          7061
+        ]
+      ],
+      "fit_seconds": 20.763,
+      "inference_ms_per_sample": 0.0007,
+      "threshold": 0.5
+    }
+  },
+  "random_forest_reproduction": {
+    "production_random_forest": {
+      "accuracy": 0.7559,
+      "precision": 0.9594,
+      "recall": 0.5964,
+      "f1_score": 0.7356,
+      "false_positive_rate": 0.0334,
+      "confusion_matrix": [
+        [
+          9387,
+          324
+        ],
+        [
+          5179,
+          7654
+        ]
+      ],
+      "training_policy": "80/20 stratified split; model fit on 80% only",
+      "thresholds": [
+        {
+          "threshold": 0.3,
+          "accuracy": 0.8188,
+          "precision": 0.959,
+          "recall": 0.7121,
+          "f1_score": 0.8173,
+          "false_positive_rate": 0.0403,
+          "confusion_matrix": [
+            [
+              9320,
+              391
+            ],
+            [
+              3695,
+              9138
+            ]
+          ]
+        },
+        {
+          "threshold": 0.35,
+          "accuracy": 0.8111,
+          "precision": 0.9584,
+          "recall": 0.6984,
+          "f1_score": 0.808,
+          "false_positive_rate": 0.0401,
+          "confusion_matrix": [
+            [
+              9322,
+              389
+            ],
+            [
+              3870,
+              8963
+            ]
+          ]
+        },
+        {
+          "threshold": 0.4,
+          "accuracy": 0.7991,
+          "precision": 0.9575,
+          "recall": 0.6771,
+          "f1_score": 0.7932,
+          "false_positive_rate": 0.0397,
+          "confusion_matrix": [
+            [
+              9325,
+              386
+            ],
+            [
+              4144,
+              8689
+            ]
+          ]
+        },
+        {
+          "threshold": 0.45,
+          "accuracy": 0.7666,
+          "precision": 0.9602,
+          "recall": 0.6155,
+          "f1_score": 0.7502,
+          "false_positive_rate": 0.0337,
+          "confusion_matrix": [
+            [
+              9384,
+              327
+            ],
+            [
+              4934,
+              7899
+            ]
+          ]
+        },
+        {
+          "threshold": 0.5,
+          "accuracy": 0.7559,
+          "precision": 0.9594,
+          "recall": 0.5964,
+          "f1_score": 0.7356,
+          "false_positive_rate": 0.0334,
+          "confusion_matrix": [
+            [
+              9387,
+              324
+            ],
+            [
+              5179,
+              7654
+            ]
+          ]
+        },
+        {
+          "threshold": 0.55,
+          "accuracy": 0.7528,
+          "precision": 0.9593,
+          "recall": 0.5907,
+          "f1_score": 0.7312,
+          "false_positive_rate": 0.0332,
+          "confusion_matrix": [
+            [
+              9389,
+              322
+            ],
+            [
+              5252,
+              7581
+            ]
+          ]
+        },
+        {
+          "threshold": 0.6,
+          "accuracy": 0.7447,
+          "precision": 0.9585,
+          "recall": 0.5765,
+          "f1_score": 0.72,
+          "false_positive_rate": 0.033,
+          "confusion_matrix": [
+            [
+              9391,
+              320
+            ],
+            [
+              5435,
+              7398
+            ]
+          ]
+        }
+      ],
+      "probability_calibration": {
+        "brier_score": 0.1714,
+        "mean_selected_class_confidence": 0.9387,
+        "mean_confidence_correct": 0.98,
+        "mean_confidence_incorrect": 0.8109,
+        "calibration_bins": [
+          {
+            "range": "0.0-0.2",
+            "samples": 11760,
+            "mean_predicted_attack_probability": 0.0163,
+            "observed_attack_rate": 0.2335
+          },
+          {
+            "range": "0.2-0.4",
+            "samples": 1709,
+            "mean_predicted_attack_probability": 0.2759,
+            "observed_attack_rate": 0.818
+          },
+          {
+            "range": "0.4-0.6",
+            "samples": 1357,
+            "mean_predicted_attack_probability": 0.466,
+            "observed_attack_rate": 0.9514
+          },
+          {
+            "range": "0.6-0.8",
+            "samples": 151,
+            "mean_predicted_attack_probability": 0.7054,
+            "observed_attack_rate": 0.8808
+          },
+          {
+            "range": "0.8-1.0",
+            "samples": 7567,
+            "mean_predicted_attack_probability": 0.9905,
+            "observed_attack_rate": 0.9601
+          }
+        ],
+        "interpretation": "Random Forest vote probabilities are not guaranteed to be calibrated confidence."
+      }
+    },
+    "experimental_random_forest": {
+      "accuracy": 0.7566,
+      "precision": 0.9595,
+      "recall": 0.5976,
+      "f1_score": 0.7365,
+      "false_positive_rate": 0.0334,
+      "confusion_matrix": [
+        [
+          9387,
+          324
+        ],
+        [
+          5164,
+          7669
+        ]
+      ],
+      "training_policy": "model fit on all KDDTrain+; threshold selected on validation split",
+      "thresholds": [
+        {
+          "threshold": 0.3,
+          "accuracy": 0.8096,
+          "precision": 0.9309,
+          "recall": 0.7188,
+          "f1_score": 0.8112,
+          "false_positive_rate": 0.0705,
+          "confusion_matrix": [
+            [
+              9026,
+              685
+            ],
+            [
+              3608,
+              9225
+            ]
+          ]
+        },
+        {
+          "threshold": 0.35,
+          "accuracy": 0.8056,
+          "precision": 0.9578,
+          "recall": 0.6888,
+          "f1_score": 0.8013,
+          "false_positive_rate": 0.0401,
+          "confusion_matrix": [
+            [
+              9322,
+              389
+            ],
+            [
+              3994,
+              8839
+            ]
+          ]
+        },
+        {
+          "threshold": 0.4,
+          "accuracy": 0.7885,
+          "precision": 0.9563,
+          "recall": 0.6585,
+          "f1_score": 0.78,
+          "false_positive_rate": 0.0397,
+          "confusion_matrix": [
+            [
+              9325,
+              386
+            ],
+            [
+              4382,
+              8451
+            ]
+          ]
+        },
+        {
+          "threshold": 0.45,
+          "accuracy": 0.7614,
+          "precision": 0.9598,
+          "recall": 0.6062,
+          "f1_score": 0.7431,
+          "false_positive_rate": 0.0336,
+          "confusion_matrix": [
+            [
+              9385,
+              326
+            ],
+            [
+              5053,
+              7780
+            ]
+          ]
+        },
+        {
+          "threshold": 0.5,
+          "accuracy": 0.7566,
+          "precision": 0.9595,
+          "recall": 0.5976,
+          "f1_score": 0.7365,
+          "false_positive_rate": 0.0334,
+          "confusion_matrix": [
+            [
+              9387,
+              324
+            ],
+            [
+              5164,
+              7669
+            ]
+          ]
+        },
+        {
+          "threshold": 0.55,
+          "accuracy": 0.7547,
+          "precision": 0.9594,
+          "recall": 0.5942,
+          "f1_score": 0.7338,
+          "false_positive_rate": 0.0333,
+          "confusion_matrix": [
+            [
+              9388,
+              323
+            ],
+            [
+              5208,
+              7625
+            ]
+          ]
+        },
+        {
+          "threshold": 0.6,
+          "accuracy": 0.7472,
+          "precision": 0.9588,
+          "recall": 0.5809,
+          "f1_score": 0.7235,
+          "false_positive_rate": 0.033,
+          "confusion_matrix": [
+            [
+              9391,
+              320
+            ],
+            [
+              5378,
+              7455
+            ]
+          ]
+        }
+      ],
+      "probability_calibration": {
+        "brier_score": 0.1744,
+        "mean_selected_class_confidence": 0.9404,
+        "mean_confidence_correct": 0.9793,
+        "mean_confidence_incorrect": 0.8193,
+        "calibration_bins": [
+          {
+            "range": "0.0-0.2",
+            "samples": 11815,
+            "mean_predicted_attack_probability": 0.0156,
+            "observed_attack_rate": 0.2366
+          },
+          {
+            "range": "0.2-0.4",
+            "samples": 1892,
+            "mean_predicted_attack_probability": 0.2969,
+            "observed_attack_rate": 0.8383
+          },
+          {
+            "range": "0.4-0.6",
+            "samples": 1062,
+            "mean_predicted_attack_probability": 0.4674,
+            "observed_attack_rate": 0.9379
+          },
+          {
+            "range": "0.6-0.8",
+            "samples": 188,
+            "mean_predicted_attack_probability": 0.6708,
+            "observed_attack_rate": 0.9096
+          },
+          {
+            "range": "0.8-1.0",
+            "samples": 7587,
+            "mean_predicted_attack_probability": 0.9911,
+            "observed_attack_rate": 0.9601
+          }
+        ],
+        "interpretation": "Random Forest vote probabilities are not guaranteed to be calibrated confidence."
+      }
+    },
+    "metric_consistency_note": "Saved model_metrics.json reports are compared against these regenerated runs; differences indicate artifact or training-policy drift.",
+    "saved_production_metrics": {
+      "accuracy": 0.7559,
+      "precision": 0.9594,
+      "recall": 0.5964,
+      "f1_score": 0.7356
+    },
+    "saved_experimental_metrics": {
+      "accuracy": 0.7566,
+      "precision": 0.9595,
+      "recall": 0.5976,
+      "f1_score": 0.7365
+    }
+  },
+  "live_feature_validation": {
+    "passed": true,
+    "observed_connection_counts": [
+      1,
+      1,
+      2
+    ],
+    "observed_packet_counts": [
+      1,
+      1,
+      1
+    ],
+    "expected_connection_counts": [
+      1,
+      1,
+      2
+    ],
+    "window_seconds": 2.0,
+    "description": "Two connections within the context window share count 2; the connection after expiry receives count 1."
+  },
+  "behavioral_detectors": {
+    "c2": {
+      "cases": [
+        {
+          "name": "periodic_beacon",
+          "expected": true,
+          "detected": true,
+          "detection_delay_seconds": 20
+        },
+        {
+          "name": "irregular_https",
+          "expected": false,
+          "detected": false,
+          "detection_delay_seconds": null
+        }
+      ],
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "false_alarm_rate": 0.0,
+      "mean_detection_delay_seconds": 20.0
+    },
+    "dns_tunneling": {
+      "cases": [
+        {
+          "name": "encoded_payload",
+          "expected": true,
+          "detected": true,
+          "detection_delay_seconds": 0.0
+        },
+        {
+          "name": "ordinary_lookup",
+          "expected": false,
+          "detected": false,
+          "detection_delay_seconds": null
+        }
+      ],
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "false_alarm_rate": 0.0,
+      "mean_detection_delay_seconds": 0.0
+    },
+    "exfiltration": {
+      "cases": [
+        {
+          "name": "large_upload",
+          "expected": true,
+          "detected": true,
+          "detection_delay_seconds": 0.0
+        },
+        {
+          "name": "ordinary_browsing",
+          "expected": false,
+          "detected": false,
+          "detection_delay_seconds": null
+        }
+      ],
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "false_alarm_rate": 0.0,
+      "mean_detection_delay_seconds": 0.0
+    }
+  },
+  "risk_engine": {
+    "cases": [
+      {
+        "name": "isolated_weak_ml",
+        "expected_attack": false,
+        "ml_only": true,
+        "ml_plus_detectors": true,
+        "full_risk_engine": false,
+        "risk_score": 40.0,
+        "severity": "MEDIUM"
+      },
+      {
+        "name": "combined_behavioral_attack",
+        "expected_attack": true,
+        "ml_only": true,
+        "ml_plus_detectors": true,
+        "full_risk_engine": true,
+        "risk_score": 85,
+        "severity": "CRITICAL"
+      },
+      {
+        "name": "strong_ml_attack",
+        "expected_attack": true,
+        "ml_only": true,
+        "ml_plus_detectors": true,
+        "full_risk_engine": true,
+        "risk_score": 95.0,
+        "severity": "CRITICAL"
+      },
+      {
+        "name": "benign_flow",
+        "expected_attack": false,
+        "ml_only": false,
+        "ml_plus_detectors": false,
+        "full_risk_engine": false,
+        "risk_score": 5.0,
+        "severity": "LOW"
+      }
+    ],
+    "ablation": {
+      "ml_only": {
+        "accuracy": 0.75,
+        "precision": 0.6667,
+        "recall": 1.0,
+        "f1_score": 0.8,
+        "false_positive_rate": 0.5,
+        "confusion_matrix": [
+          [
+            1,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "hidden_genuine_attacks": 0
+      },
+      "ml_plus_detectors": {
+        "accuracy": 0.75,
+        "precision": 0.6667,
+        "recall": 1.0,
+        "f1_score": 0.8,
+        "false_positive_rate": 0.5,
+        "confusion_matrix": [
+          [
+            1,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "hidden_genuine_attacks": 0
+      },
+      "full_risk_engine": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "false_positive_rate": 0.0,
+        "confusion_matrix": [
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "hidden_genuine_attacks": 0
+      }
+    },
+    "prioritization_order": [
+      "strong_ml_attack",
+      "combined_behavioral_attack",
+      "isolated_weak_ml",
+      "benign_flow"
+    ]
+  },
+  "live_latency": {
+    "samples": 722,
+    "session_scope": "Append-only telemetry; rows may span multiple capture sessions.",
+    "capture_to_alert_ms": {
+      "p50": 5722.721,
+      "p95": 7207.458,
+      "max": 11396.974
+    },
+    "prediction_processing_ms": {
+      "p50": 24.68,
+      "p95": 88.76,
+      "max": 2749.072
+    }
+  },
+  "live_runtime": {
+    "samples": 2173,
+    "session_scope": "Append-only telemetry; rows may span multiple capture sessions.",
+    "packets_seen": 50236,
+    "flows_predicted": 241,
+    "packets_per_second": {
+      "p50": 4.944,
+      "p95": 152.592,
+      "max": 1383.544
+    },
+    "cpu_percent": {
+      "p50": 1.5,
+      "p95": 12.0,
+      "max": 92.8
+    },
+    "rss_mb": {
+      "p50": 221.75,
+      "p95": 224.664,
+      "max": 225.094
+    },
+    "packet_loss": "not measured by the current Scapy capture loop"
+  },
+  "controlled_runtime_benchmark": {
+    "iterations": 1000,
+    "flow_evaluations_per_second": 10.41,
+    "per_flow_wall_ms": {
+      "p50": 95.9496,
+      "p95": 103.1287,
+      "max": 292.55
+    },
+    "process_cpu_seconds": 96.2656,
+    "peak_python_allocations_mb": 0.9436,
+    "scope": "Synthetic flow evaluation; excludes packet capture, flow timeout, OS scheduling, and network I/O."
+  },
+  "limitations": [
+    "NSL-KDD features remain an offline representation of traffic; live traffic is reduced to five aggregate flow fields.",
+    "Offline test metrics do not establish real-world detection performance or alert latency.",
+    "Controlled detector fixtures test logic, not prevalence, drift, or production false-alarm rates.",
+    "A contemporary-dataset result requires a labeled external CSV and should be reported separately from NSL-KDD.",
+    "Live telemetry files are append-only and currently span multiple capture sessions; the reported quantiles are aggregate observations, not a clean single-session load test."
+  ]
+}

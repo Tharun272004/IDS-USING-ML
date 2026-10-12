@@ -1,0 +1,23 @@
+.venv/
+.venv-1/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.vscode/
+
+# Local runtime output
+logs/*
+!logs/.gitkeep
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS metadata
+Thumbs.db
+desktop.ini

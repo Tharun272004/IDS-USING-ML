@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Attack Investigation | Real-Time IDS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/attack_details.css'
+          ) }}">
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div>
+
+            <h1>
+                🔎 Attack Investigation
+            </h1>
+
+            <p>
+                Detailed analysis of a detected network intrusion
+            </p>
+
+        </div>
+
+
+        <div class="header-buttons">
+
+            <a
+                href="/dashboard"
+                class="button">
+
+                ← Dashboard
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+
+    {% if attack %}
+
+
+    <!-- ALERT -->
+
+    <section class="warning">
+
+        <div class="warning-icon">
+
+            ⚠
+
+        </div>
+
+
+        <div>
+
+            <h2>
+                Potential Intrusion Detected
+            </h2>
+
+            <p>
+
+                The machine-learning model classified this
+                network flow as an attack.
+
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- SUMMARY -->
+
+    <section>
+
+        <h2 class="section-title">
+            Attack Summary
+        </h2>
+
+
+        <div class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <span>
+                    Prediction
+                </span>
+
+                <strong class="attack">
+
+                    {{ attack.prediction }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Confidence
+                </span>
+
+                <strong class="attack">
+
+                    {{ attack.confidence }}%
+
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Attack Probability
+                </span>
+
+                <strong class="risk">
+
+                    {{ attack.attack_probability }}%
+
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Detection Time
+                </span>
+
+                <strong>
+
+                    {{ attack.time }}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- NETWORK DETAILS -->
+
+    <section>
+
+        <div class="panel">
+
+            <h2>
+                Network Flow Details
+            </h2>
+
+
+            <div class="details-grid">
+
+
+                <div class="detail">
+
+                    <span>
+                        Source
+                    </span>
+
+                    <strong>
+                        {{ attack.source }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Destination
+                    </span>
+
+                    <strong>
+                        {{ attack.destination }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Protocol
+                    </span>
+
+                    <strong>
+
+                        {{ attack.protocol.upper() }}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Flow Duration
+                    </span>
+
+                    <strong>
+
+                        {{ attack.duration }} seconds
+
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Source Bytes
+                    </span>
+
+                    <strong>
+
+                        {{ attack.src_bytes }}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Destination Bytes
+                    </span>
+
+                    <strong>
+
+                        {{ attack.dst_bytes }}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Packet Count
+                    </span>
+
+                    <strong>
+
+                        {{ attack.packet_count }}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        ML Threshold
+                    </span>
+
+                    <strong>
+                        0.30
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Classification
+                    </span>
+
+                    <strong class="attack">
+
+                        ATTACK
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- EXPLANATION -->
+
+    <section>
+
+        <div class="panel">
+
+            <h2>
+                Why Was This Flow Flagged?
+            </h2>
+
+
+            <div class="explanation">
+
+
+                <div class="explanation-item">
+
+                    <div class="number">
+                        1
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Network Flow Captured
+                        </h3>
+
+                        <p>
+
+                            The packet capture component observed
+                            communication between
+                            <strong>
+                                {{ attack.source }}
+                            </strong>
+                            and
+                            <strong>
+                                {{ attack.destination }}
+                            </strong>.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="explanation-item">
+
+                    <div class="number">
+                        2
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Flow Features Extracted
+                        </h3>
+
+                        <p>
+
+                            The system calculated flow-level
+                            characteristics including duration,
+                            packet count, source bytes and
+                            destination bytes.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="explanation-item">
+
+                    <div class="number">
+                        3
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Machine Learning Classification
+                        </h3>
+
+                        <p>
+
+                            The Random Forest model calculated
+                            an attack probability of
+                            <strong>
+                                {{ attack.attack_probability }}%
+                            </strong>.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="explanation-item">
+
+                    <div class="number">
+                        4
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Attack Threshold Applied
+                        </h3>
+
+                        <p>
+
+                            The configured classification
+                            threshold is
+                            <strong>0.30</strong>.
+                            The flow was classified as an
+                            <strong>ATTACK</strong>.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- RECOMMENDATION -->
+
+    <section>
+
+        <div class="recommendation">
+
+            <h2>
+                🛡 Security Recommendation
+            </h2>
+
+
+            <ul>
+
+                <li>
+                    Investigate the source and destination
+                    endpoints associated with this flow.
+                </li>
+
+                <li>
+                    Review other network flows from the same
+                    source address.
+                </li>
+
+                <li>
+                    Check whether similar traffic patterns
+                    occurred repeatedly.
+                </li>
+
+                <li>
+                    If the traffic is confirmed malicious,
+                    consider blocking the source.
+                </li>
+
+                <li>
+                    Continue monitoring the network for
+                    additional suspicious activity.
+                </li>
+
+            </ul>
+
+        </div>
+
+    </section>
+
+
+
+    {% else %}
+
+
+    <!-- NO ATTACK -->
+
+    <section class="panel no-attack">
+
+        <div class="warning-icon">
+            ?
+        </div>
+
+        <h2>
+            Attack Record Not Found
+        </h2>
+
+        <p>
+
+            The requested attack record could not be
+            found in the live prediction log.
+
+        </p>
+
+
+        <a
+            href="/dashboard"
+            class="button">
+
+            Return to Dashboard
+
+        </a>
+
+    </section>
+
+
+    {% endif %}
+
+
+
+    <footer>
+
+        Real-Time IDS • Attack Investigation Module
+
+    </footer>
+
+
+</div>
+
+
+</body>
+
+</html>

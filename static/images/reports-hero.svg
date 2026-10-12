@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Forensic security report visualization</title>
+  <desc id="desc">A dark security report dashboard with document panels, scan lines, and network activity indicators.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07152d"/>
+      <stop offset="1" stop-color="#164e63"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#55d6c2"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="650" fill="url(#background)"/>
+  <g opacity=".18" stroke="#7dd3fc" fill="none">
+    <path d="M0 520h270l70-80h210l75-90h260l90-100h225"/>
+    <path d="M0 575h310l80-90h185l90-100h240l90-90h205"/>
+    <path d="M710 0v170l-80 80v150"/>
+  </g>
+  <g transform="translate(180 95)">
+    <rect width="520" height="380" rx="18" fill="#f8fafc" opacity=".97"/>
+    <rect width="520" height="62" rx="18" fill="#dbeafe"/>
+    <circle cx="34" cy="31" r="8" fill="#ef4444"/>
+    <circle cx="62" cy="31" r="8" fill="#f59e0b"/>
+    <circle cx="90" cy="31" r="8" fill="#22c55e"/>
+    <rect x="42" y="104" width="160" height="16" rx="8" fill="#172033"/>
+    <rect x="42" y="140" width="390" height="10" rx="5" fill="#cbd5e1"/>
+    <rect x="42" y="164" width="330" height="10" rx="5" fill="#e2e8f0"/>
+    <rect x="42" y="214" width="130" height="112" rx="10" fill="#fee2e2"/>
+    <rect x="194" y="214" width="130" height="112" rx="10" fill="#dcfce7"/>
+    <rect x="346" y="214" width="130" height="112" rx="10" fill="#dbeafe"/>
+    <path d="M66 294l24-35 22 18 25-45 24 30" fill="none" stroke="#dc2626" stroke-width="7"/>
+    <path d="M218 292l24-28 22 15 24-39 24 24" fill="none" stroke="#16a34a" stroke-width="7"/>
+    <path d="M370 292l24-18 22 8 24-43 24 22" fill="none" stroke="#2563eb" stroke-width="7"/>
+  </g>
+  <g fill="url(#accent)">
+    <circle cx="890" cy="150" r="9"/><circle cx="1020" cy="280" r="6"/><circle cx="850" cy="470" r="7"/>
+  </g>
+  <g stroke="#67e8f9" stroke-width="3" opacity=".65">
+    <path d="M700 180l190-30 130 130"/><path d="M700 180l150 290"/>
+  </g>
+</svg>

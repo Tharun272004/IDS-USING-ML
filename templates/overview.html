@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Overview & ML Models | Real-Time IDS</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}?v=7">
+
+    <style>
+        .overview-container {
+            width: 94%;
+            max-width: 1400px;
+            margin: auto;
+            padding: 30px 0 60px;
+        }
+
+        body {
+            background:
+                linear-gradient(rgba(6, 19, 39, 0.78), rgba(6, 19, 39, 0.78)),
+                url("{{ url_for('static', filename='images/reports-hero.svg') }}") center / cover fixed;
+            color: #172033;
+        }
+
+        .overview-hero {
+            background: linear-gradient(135deg, #101827 0%, #1e3a52 100%);
+            color: white;
+            border-radius: 14px;
+            padding: 42px 46px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            animation: overviewReveal 0.55s ease-out both;
+        }
+
+        .overview-hero h2 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .overview-hero p {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.6;
+            max-width: 950px;
+        }
+
+        .card-deck {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #dce6ef;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card-custom-production {
+            border-top: 4px solid #16a34a;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-3px);
+            border-color: #8bd5d0;
+            box-shadow: 0 12px 26px rgba(15, 118, 110, 0.12);
+        }
+
+        .card-custom h3 {
+            font-size: 18px;
+            color: #0f172a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .card-list {
+            font-size: 13px;
+            color: #475569;
+            padding-left: 18px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .card-custom p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .pill-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .pill-prod {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .pill-comp {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .section-box {
+            background: white;
+            border-radius: 14px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+            border: 1px solid #dce6ef;
+            animation: overviewReveal 0.55s ease-out both;
+        }
+
+        .section-box h3 {
+            font-size: 20px;
+            color: #0f172a;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 12px;
+            letter-spacing: 0.1px;
+        }
+
+        .models-intro {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .threat-engines-title {
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: 0.25px;
+            color: #123b55;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+        }
+
+        .comparison-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .comparison-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .highlight-row {
+            background: #f0fdf4 !important;
+            font-weight: 600;
+        }
+
+        .highlight-row td:first-child {
+            border-left: 4px solid #16a34a;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 14px;
+        }
+
+        .feature-item {
+            background: linear-gradient(145deg, #f8fafc, #eef6ff);
+            border: 1px solid #dbe7f3;
+            border-radius: 12px;
+            padding: 18px;
+            border-left: 4px solid #0ea5a8;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(30, 64, 175, 0.12);
+        }
+
+        .feature-item strong {
+            display: block;
+            color: #0f172a;
+            font-size: 15px;
+            margin-bottom: 6px;
+            font-family: monospace;
+        }
+
+        .feature-item span {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+            display: block;
+        }
+
+        .threat-engine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .threat-engine-card {
+            border-radius: 12px;
+            padding: 22px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #4169e1;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .threat-engine-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+        }
+
+        .threat-engine-card.dns {
+            border-top-color: #8b5cf6;
+        }
+
+        .threat-engine-card.c2 {
+            border-top-color: #ec4899;
+        }
+
+        .threat-engine-card.exfil {
+            border-top-color: #f97316;
+        }
+
+        .threat-engine-card.risk {
+            border-top-color: #10b981;
+        }
+
+        .threat-engine-card h4 {
+            font-size: 17px;
+            color: #0f172a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .threat-engine-card p {
+            font-size: 13.5px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .threat-engine-card ul {
+            display: grid;
+            gap: 8px;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            color: #475569;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .threat-engine-card li {
+            position: relative;
+            padding: 9px 10px 9px 28px;
+            background: #f8fafc;
+            border: 1px solid #e5edf3;
+            border-radius: 8px;
+        }
+
+        .threat-engine-card li::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 11px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #0ea5a8;
+            box-shadow: 0 0 0 4px rgba(14, 165, 168, 0.12);
+        }
+
+        .threat-engine-card li strong {
+            color: #164e63;
+            font-weight: 800;
+        }
+
+        .model-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .model-metric {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 7px;
+            background: #f8fafc;
+            border: 1px solid #e5edf3;
+            font-size: 12px;
+        }
+
+        .model-metric-label {
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .model-metric-value {
+            font-weight: 800;
+        }
+
+        .metric-accuracy .model-metric-value { color: #2563eb; }
+        .metric-precision .model-metric-value { color: #0f766e; }
+        .metric-recall .model-metric-value { color: #0f766e; }
+        .metric-f1 .model-metric-value { color: #7c3aed; }
+
+        .tech-badge-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .tech-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 82px;
+            background: linear-gradient(135deg, #eff6ff, #ecfeff);
+            color: #164e63;
+            padding: 10px 14px;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(14, 165, 168, 0.08);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .tech-badge small {
+            display: block;
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.35;
+        }
+
+        .tech-badge:hover {
+            transform: translateY(-2px);
+            border-color: #0ea5a8;
+        }
+
+        .dataset-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .dataset-card {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #eff6ff, #f8fafc);
+            border: 1px solid #dbe7f3;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .dataset-card::after {
+            content: "";
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            right: -24px;
+            bottom: -28px;
+            border: 10px solid rgba(14, 165, 168, 0.12);
+            border-radius: 50%;
+        }
+
+        .dataset-card-label {
+            display: block;
+            color: #0e7490;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
+
+        .dataset-card strong {
+            display: block;
+            margin-top: 6px;
+            color: #0f172a;
+            font-size: 20px;
+        }
+
+        .dataset-card span:last-child {
+            display: block;
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .stack-intro {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 720px;
+        }
+
+        @keyframes overviewReveal {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .overview-hero,
+            .section-box {
+                animation: none;
+            }
+
+            .card-custom,
+            .feature-item,
+            .threat-engine-card,
+            .tech-badge {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     TOP NAVIGATION BAR
+====================================================== -->
+<header class="topbar">
+
+    <div>
+        <h1>Real-Time Intrusion Detection System</h1>
+        <p>Machine Learning Network Security Monitor</p>
+    </div>
+
+    <div class="header-right">
+
+        <a href="/dashboard" class="top-nav-link">
+            📊 Dashboard
+        </a>
+
+        <a href="/overview" class="top-nav-link active">
+            📘 Overview
+        </a>
+
+        <a href="/reports" class="top-nav-link">
+            📑 Reports
+        </a>
+
+        <a href="/live-monitoring" class="top-nav-link live-link">
+            📡 Live Monitoring
+        </a>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            DASHBOARD ONLINE
+        </div>
+
+    </div>
+
+</header>
+
+<main class="overview-container">
+
+    <!-- =====================================================
+         HERO OVERVIEW
+    ====================================================== -->
+    <div class="overview-hero">
+        <h2>📘 Project Overview & Machine Learning Architecture</h2>
+        <p>
+            A multi-engine Intrusion Detection System that combines flow-level Random Forest inference with C2, DNS tunneling, exfiltration, and risk-scoring logic. Offline NSL-KDD results, controlled detector tests, and live telemetry are reported separately so implementation capability is not confused with real-world validation.
+        </p>
+    </div>
+
+    <!-- =====================================================
+         KEY ML MODELS USED & HOW THEY WORK
+    ====================================================== -->
+    <div class="section-box">
+        <h3>🤖 Machine Learning Models & Algorithm Details</h3>
+        <p class="models-intro">
+            The project evaluated multiple statistical and ensemble learning algorithms before selecting the production ensemble:
+        </p>
+
+        <div class="card-deck">
+            <!-- Random Forest (Production) -->
+            <div class="card-custom card-custom-production">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3>🌲 Random Forest</h3>
+                        <span class="pill-badge pill-prod">PRODUCTION</span>
+                    </div>
+                    <p>
+                        <strong>How it works:</strong> An ensemble of 300 de-correlated decision trees uses bootstrap aggregation. Tree votes produce an attack probability for each five-feature flow; the risk engine then combines that signal with behavioral evidence.
+                    </p>
+                    <ul style="font-size: 13px; color: #475569; padding-left: 18px; line-height: 1.5; margin-bottom: 12px;">
+                        <li>300 Estimators, Balanced class weighting</li>
+                        <li>Min samples leaf = 2, Threshold = 0.50</li>
+                        <li>Model probability and risk score are reported separately</li>
+                    </ul>
+                </div>
+                <div class="model-metrics" aria-label="Random Forest performance metrics">
+                    <div class="model-metric metric-accuracy"><span class="model-metric-label">Accuracy</span><span class="model-metric-value">75.59%</span></div>
+                    <div class="model-metric metric-precision"><span class="model-metric-label">Precision</span><span class="model-metric-value">95.94%</span></div>
+                    <div class="model-metric metric-recall"><span class="model-metric-label">Recall</span><span class="model-metric-value">59.64%</span></div>
+                    <div class="model-metric metric-f1"><span class="model-metric-label">F1 Score</span><span class="model-metric-value">73.56%</span></div>
+                </div>
+            </div>
+
+            <!-- Decision Tree -->
+            <div class="card-custom">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3>🌿 Decision Tree (CART)</h3>
+                        <span class="pill-badge pill-comp">BENCHMARK</span>
+                    </div>
+                    <p>
+                        <strong>How it works:</strong> Partitions the 5-dimensional flow feature space using Gini impurity splits. Offers high interpretability but is prone to overfitting on high byte counts and variance spikes.
+                    </p>
+                    <ul style="font-size: 13px; color: #475569; padding-left: 18px; line-height: 1.5; margin-bottom: 12px;">
+                        <li>Fast execution, low memory footprint</li>
+                        <li>High sensitivity to noisy boundary flows</li>
+                        <li>Used as the base estimator inside Random Forest</li>
+                    </ul>
+                </div>
+                <div class="model-metrics" aria-label="Decision Tree performance metrics">
+                    <div class="model-metric metric-accuracy"><span class="model-metric-label">Accuracy</span><span class="model-metric-value">73.12%</span></div>
+                    <div class="model-metric metric-precision"><span class="model-metric-label">Precision</span><span class="model-metric-value">91.80%</span></div>
+                    <div class="model-metric metric-recall"><span class="model-metric-label">Recall</span><span class="model-metric-value">55.30%</span></div>
+                    <div class="model-metric metric-f1"><span class="model-metric-label">F1 Score</span><span class="model-metric-value">69.00%</span></div>
+                </div>
+            </div>
+
+            <!-- Logistic Regression -->
+            <div class="card-custom">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3>📉 Logistic Regression</h3>
+                        <span class="pill-badge pill-comp">BENCHMARK</span>
+                    </div>
+                    <p>
+                        <strong>How it works:</strong> Provides a linear probabilistic baseline using the same five live-compatible features and the same official NSL-KDD test set.
+                    </p>
+                    <ul style="font-size: 13px; color: #475569; padding-left: 18px; line-height: 1.5; margin-bottom: 12px;">
+                        <li>Useful reference for a linear decision boundary</li>
+                        <li>Class-balanced training</li>
+                        <li>Evaluated at the fixed 0.50 operating point</li>
+                    </ul>
+                </div>
+                <div class="model-metrics" aria-label="Logistic Regression performance metrics">
+                    <div class="model-metric metric-accuracy"><span class="model-metric-label">Accuracy</span><span class="model-metric-value">68.19%</span></div>
+                    <div class="model-metric metric-precision"><span class="model-metric-label">Precision</span><span class="model-metric-value">90.30%</span></div>
+                    <div class="model-metric metric-recall"><span class="model-metric-label">Recall</span><span class="model-metric-value">49.42%</span></div>
+                    <div class="model-metric metric-f1"><span class="model-metric-label">F1 Score</span><span class="model-metric-value">63.88%</span></div>
+                </div>
+            </div>
+
+            <!-- MLP neural baseline -->
+            <div class="card-custom">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3>🧠 MLP Neural Baseline</h3>
+                        <span class="pill-badge pill-comp">BENCHMARK</span>
+                    </div>
+                    <p>
+                        <strong>How it works:</strong> Uses two hidden layers as a basic neural comparison under the same feature and test-set conditions. It is not a CNN-LSTM comparison.
+                    </p>
+                    <ul style="font-size: 13px; color: #475569; padding-left: 18px; line-height: 1.5; margin-bottom: 12px;">
+                        <li>Same five live-compatible features</li>
+                        <li>Evaluated as a neural baseline only</li>
+                        <li>No deep sequence model is currently implemented</li>
+                    </ul>
+                </div>
+                <div class="model-metrics" aria-label="MLP neural baseline performance metrics">
+                    <div class="model-metric metric-accuracy"><span class="model-metric-label">Accuracy</span><span class="model-metric-value">73.70%</span></div>
+                    <div class="model-metric metric-precision"><span class="model-metric-label">Precision</span><span class="model-metric-value">97.82%</span></div>
+                    <div class="model-metric metric-recall"><span class="model-metric-label">Recall</span><span class="model-metric-value">55.02%</span></div>
+                    <div class="model-metric metric-f1"><span class="model-metric-label">F1 Score</span><span class="model-metric-value">70.43%</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         MODEL COMPARISON MATRIX TABLE
+    ====================================================== -->
+    <div class="section-box">
+        <h3>📈 Algorithm Comparison & Performance Benchmarks</h3>
+        <p style="color: #64748b; font-size: 14px;">
+            Benchmarked against the official <strong>NSL-KDD Testing Set (22,544 samples)</strong> under identical five-feature extraction constraints. These are offline metrics, not live-network accuracy.
+        </p>
+
+        <div class="table-wrapper" style="overflow-x: auto;">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Accuracy</th>
+                        <th>Precision (Attack)</th>
+                        <th>Recall (Attack)</th>
+                        <th>F1 Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td><strong>Random Forest Classifier (300 Trees)</strong></td>
+                        <td>75.59%</td>
+                        <td><strong>95.94%</strong></td>
+                        <td>59.64%</td>
+                        <td><strong>73.56%</strong></td>
+                        <td><span class="pill-badge pill-prod">PRODUCTION</span></td>
+                    </tr>
+                    <tr>
+                        <td>Decision Tree (CART)</td>
+                        <td>76.14%</td>
+                        <td>92.64%</td>
+                        <td>63.10%</td>
+                        <td>75.07%</td>
+                        <td><span class="pill-badge pill-comp">Evaluated</span></td>
+                    </tr>
+                    <tr>
+                        <td>Logistic Regression</td>
+                        <td>68.19%</td>
+                        <td>90.30%</td>
+                        <td>49.42%</td>
+                        <td>63.88%</td>
+                        <td><span class="pill-badge pill-comp">Evaluated</span></td>
+                    </tr>
+                    <tr>
+                        <td>MLP Neural Baseline</td>
+                        <td>73.70%</td>
+                        <td>97.82%</td>
+                        <td>55.02%</td>
+                        <td>70.43%</td>
+                        <td><span class="pill-badge pill-comp">Evaluated</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         TRAINING DATASET & EXTRACTED FEATURES
+    ====================================================== -->
+    <div class="section-box">
+        <h3>📚 Training Dataset & Feature Engineering</h3>
+        <p style="color: #64748b; font-size: 14px;">
+            The model was trained and evaluated on the <strong>NSL-KDD</strong> network intrusion dataset. NSL-KDD is an offline benchmark; it does not establish live-network accuracy or cross-dataset generalization.
+        </p>
+
+        <div class="dataset-summary">
+            <div class="dataset-card">
+                <span class="dataset-card-label">TRAINING DATASET</span>
+                <strong>KDDTrain+.txt</strong>
+                <span>125,973 Samples</span>
+            </div>
+            <div class="dataset-card">
+                <span class="dataset-card-label">VALIDATION SPLIT</span>
+                <strong>KDDTrain+ 80/20</strong>
+                <span>25,195 Samples</span>
+            </div>
+            <div class="dataset-card">
+                <span class="dataset-card-label">TEST BENCHMARK</span>
+                <strong>Holdout Test</strong>
+                <span>22,544 Samples</span>
+            </div>
+            <div class="dataset-card">
+                <span class="dataset-card-label">DECISION THRESHOLD</span>
+                <strong>0.50 Threshold</strong>
+                <span>Fixed 0.50 operating point</span>
+            </div>
+        </div>
+
+        <h4 style="font-size: 16px; color: #0f172a; margin: 20px 0 10px;">5 Flow-Level Features Extracted in Real Time:</h4>
+        <div class="features-grid">
+            <div class="feature-item">
+                <strong>1. duration</strong>
+                <span>Elapsed time in seconds between flow SYN/first packet and connection termination or timeout.</span>
+            </div>
+            <div class="feature-item">
+                <strong>2. protocol_type</strong>
+                <span>Encoded transport protocol (TCP, UDP, ICMP) mapped to model label encoding.</span>
+            </div>
+            <div class="feature-item">
+                <strong>3. src_bytes</strong>
+                <span>Total payload and header bytes transferred from client/initiator to server.</span>
+            </div>
+            <div class="feature-item">
+                <strong>4. dst_bytes</strong>
+                <span>Total payload and header bytes transferred from server back to client.</span>
+            </div>
+            <div class="feature-item">
+                <strong>5. count</strong>
+                <span>Recent connections to the same destination host within a two-second context window; packet count is tracked separately.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>📏 Evidence, Confidence &amp; Runtime Status</h3>
+        <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+            The displayed model confidence is the Random Forest probability for the selected class; it is not prediction accuracy and is not calibrated real-world likelihood. The independent risk score is reported separately and combines ML, behavioral, volume, and history signals.
+        </p>
+        <div class="features-grid">
+            <div class="feature-item">
+                <strong>Offline benchmark</strong>
+                <span>Production RF: 75.59% accuracy, 95.94% precision, 59.64% recall, and 73.56% F1 on NSL-KDD.</span>
+            </div>
+            <div class="feature-item">
+                <strong>Controlled tests</strong>
+                <span>Detector and risk-engine fixtures are preliminary and do not establish production false-alarm rates.</span>
+            </div>
+            <div class="feature-item">
+                <strong>Live telemetry</strong>
+                <span>Capture-to-alert data is written to live_latency.csv; CPU, memory, packet rate, and flow data are written to live_runtime.csv during capture.</span>
+            </div>
+            <div class="feature-item">
+                <strong>Claim boundary</strong>
+                <span>No live accuracy, external-dataset generalization, or CNN-LSTM superiority claim is established.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         4 ADVANCED THREAT ENGINES & CAPABILITIES
+    ====================================================== -->
+    <div class="section-box">
+        <h3 class="threat-engines-title">🛡️ Specialized Cyber Threat Engines (Problem Statements)</h3>
+        <p style="color: #64748b; font-size: 14px;">
+            The system supplements the flow classifier with three behavioral detectors and one risk-correlation engine. Their current quantitative evaluation is based on limited controlled fixtures.
+        </p>
+
+        <div class="threat-engine-grid">
+            <!-- Problem 1: C2 -->
+            <div class="threat-engine-card c2">
+                <h4>📡 Encrypted C2 Beaconing (Problem 1)</h4>
+                <p>Looks for repeated, low-jitter connection timing and lightweight heartbeat-like flows, including encrypted traffic where payload inspection is unavailable.</p>
+                <ul>
+                    <li>Tracks inter-arrival interval time ($\Delta t$) per <code>(src, dst, port)</code></li>
+                    <li>Calculates coefficient of variation ($CV = \sigma / \mu$) to measure jitter</li>
+                    <li>Flags machine-driven timers ($CV \le 0.15$) with lightweight heartbeat payloads (&lt; 4KB)</li>
+                </ul>
+            </div>
+
+            <!-- Problem 2: DNS -->
+            <div class="threat-engine-card dns">
+                <h4>🌐 Covert DNS Tunneling (Problem 2)</h4>
+                <p>Scores DNS names for entropy, length, label structure, and encoded-looking payload patterns while allowing configured provider suffixes.</p>
+                <ul>
+                    <li>Calculates mathematical <strong>Shannon Entropy</strong> ($H \ge 3.6$ - $4.0$)</li>
+                    <li>Measures subdomain label length (&gt; 35 chars) and total query length (&gt; 60 chars)</li>
+                    <li>Hex &amp; Base64 regex pattern checks with cloud provider whitelisting</li>
+                </ul>
+            </div>
+
+            <!-- Problem 3: Exfiltration -->
+            <div class="threat-engine-card exfil">
+                <h4>🚀 Data Exfiltration Detector</h4>
+                <p>Scores upload-heavy flows using transfer size, direction asymmetry, velocity, and cumulative host egress.</p>
+                <ul>
+                    <li>Analyzes directional byte asymmetry ($src\_bytes \gg dst\_bytes$, $\ge 15\times$)</li>
+                    <li>Flags burst velocity exceeding 500 KB/s - 1 MB/s</li>
+                    <li>Tracks cumulative 60-second host egress spikes (&gt; 5 MB bursts)</li>
+                </ul>
+            </div>
+
+            <!-- Problem 4: Risk Engine -->
+            <div class="threat-engine-card risk">
+                <h4>⚖️ False-Positive Risk Engine (Problem 4)</h4>
+                <p>Correlates signals over a 120-second stateful sliding window to prioritize alerts and dampen isolated weak ML anomalies.</p>
+                <ul>
+                    <li>De-escalates isolated single-packet anomalies (&lt; 65% probability)</li>
+                    <li>Escalates score with persistent suspicious observations</li>
+                    <li>Produces unified 0–100 threat score and categorized severity bands</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         TECHNOLOGY STACK
+    ====================================================== -->
+    <div class="section-box">
+        <h3>💻 Technology & Training Stack</h3>
+        <p class="stack-intro">A lightweight production stack connects packet capture, feature preparation, machine-learning inference, threat scoring, and forensic export in one workflow.</p>
+        <div class="tech-badge-list">
+            <span class="tech-badge">Python 3.14<small>Core runtime and detection services</small></span>
+            <span class="tech-badge">Flask 3.1<small>Web dashboard and REST API</small></span>
+            <span class="tech-badge">Scapy 2.7<small>Promiscuous packet capture</small></span>
+            <span class="tech-badge">Scikit-Learn 1.9<small>Model training and inference</small></span>
+            <span class="tech-badge">Pandas 3.0<small>Dataset preparation and exports</small></span>
+            <span class="tech-badge">NumPy 2.5<small>Numerical feature calculations</small></span>
+            <span class="tech-badge">Joblib 1.5<small>Persisting trained models</small></span>
+            <span class="tech-badge">psutil 7.0<small>Live CPU and memory telemetry</small></span>
+            <span class="tech-badge">ReportLab 5.0<small>Forensic PDF generation</small></span>
+            <span class="tech-badge">HTML5 / CSS3 / Vanilla JS<small>Interactive monitoring interface</small></span>
+            <span class="tech-badge">Npcap Driver<small>Windows network capture support</small></span>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>

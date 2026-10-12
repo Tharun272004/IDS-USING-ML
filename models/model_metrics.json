@@ -1,0 +1,81 @@
+{
+    "algorithm": "Random Forest Classifier",
+    "dataset": "NSL-KDD",
+    "training_samples": 100778,
+    "validation_samples": 25195,
+    "testing_samples": 22544,
+    "features": [
+        "duration",
+        "protocol_type",
+        "src_bytes",
+        "dst_bytes",
+        "count"
+    ],
+    "n_estimators": 300,
+    "class_weight": "balanced",
+    "min_samples_leaf": 2,
+    "accuracy": 0.7559,
+    "precision": 0.9594,
+    "recall": 0.5964,
+    "f1_score": 0.7356,
+    "threshold": 0.5,
+    "validation_threshold_results": [
+        {
+            "threshold": 0.3,
+            "precision": 0.9469,
+            "recall": 0.9988,
+            "f1_score": 0.9722
+        },
+        {
+            "threshold": 0.35,
+            "precision": 0.947,
+            "recall": 0.9987,
+            "f1_score": 0.9722
+        },
+        {
+            "threshold": 0.4,
+            "precision": 0.9473,
+            "recall": 0.9983,
+            "f1_score": 0.9721
+        },
+        {
+            "threshold": 0.45,
+            "precision": 0.9876,
+            "recall": 0.9667,
+            "f1_score": 0.977
+        },
+        {
+            "threshold": 0.5,
+            "precision": 0.9887,
+            "recall": 0.9662,
+            "f1_score": 0.9773
+        },
+        {
+            "threshold": 0.55,
+            "precision": 0.9887,
+            "recall": 0.9657,
+            "f1_score": 0.977
+        },
+        {
+            "threshold": 0.6,
+            "precision": 0.9952,
+            "recall": 0.9578,
+            "f1_score": 0.9761
+        }
+    ],
+    "confusion_matrix": [
+        [
+            9387,
+            324
+        ],
+        [
+            5179,
+            7654
+        ]
+    ],
+    "protocol_classes": [
+        "icmp",
+        "tcp",
+        "udp"
+    ]
+}
